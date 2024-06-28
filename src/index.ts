@@ -1,5 +1,5 @@
 const cube: Cube = new Cube()
-  .translate(new Vec3(0, 0, 3))
+  .translate(new Vec3(2, -2, 3))
 
 const graphics: Graphics = new Graphics().appendTo(document.body)
 
@@ -27,7 +27,6 @@ function drawLoop(timestamp: number = 0): void {
   })
 
   for (const triangle of filtered) {
-    // for (const triangle of triangles) {
     graphics.triangleToScreenSpace(triangle)
   }
 
