@@ -43,7 +43,7 @@ class Cube {
         this.scale.z *= z;
         return this;
     }
-    project(projectionMatrix) {
+    applyMatrices(projectionMatrix) {
         return this.mesh.projectTriangles({
             scale: Matrix.FromArr([
                 [this.scale.x, 0, 0, 0],
