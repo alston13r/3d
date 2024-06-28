@@ -91,7 +91,7 @@ class Graphics {
       .lineTo(x2, y2)
       .lineTo(x3, y3)
       .closePath()
-      .stroke()
+      .fill()
   }
 
   triangleFromVec3(p1: Vec3, p2: Vec3, p3: Vec3): void {
