@@ -15,6 +15,14 @@ class Triangle {
     return L1.cross(L2).normal()
   }
 
+  project(matrix: Matrix): Triangle {
+    return new Triangle(
+      this.p1.project(matrix),
+      this.p2.project(matrix),
+      this.p3.project(matrix)
+    )
+  }
+
   draw(graphics: Graphics): void {
     graphics.triangleFromVec3(this.p1, this.p2, this.p3)
   }
