@@ -23,7 +23,7 @@ function drawLoop(timestamp = 0) {
         const dp = lightDir.dot(normal);
         const s = Math.round(lerp(dp, 0, 1, 10, 250)).toString(16);
         graphics.fillStyle = '#' + s + s + s;
-        const projectedTriangle = triangle.toTriangle().project(projectionMatrix);
+        const projectedTriangle = triangle.project(projectionMatrix);
         graphics.triangleToScreenSpace(projectedTriangle);
     }
     window.requestAnimationFrame(drawLoop);

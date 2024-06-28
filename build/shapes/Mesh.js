@@ -67,18 +67,9 @@ class MeshTriangle {
         const L2 = p3.sub(p1);
         return L1.cross(L2).normal();
     }
-    draw(graphics) {
-        graphics.triangleFromVec3(this.getP1(), this.getP2(), this.getP3());
-    }
     project(matrix) {
-        return [
-            this.getP1().project(matrix),
-            this.getP2().project(matrix),
-            this.getP3().project(matrix)
-        ];
-    }
-    toTriangle() {
-        return new Triangle(this.getP1(), this.getP2(), this.getP3());
+        return new Triangle(this.getP1(), this.getP2(), this.getP3())
+            .project(matrix);
     }
 }
 //# sourceMappingURL=Mesh.js.map
