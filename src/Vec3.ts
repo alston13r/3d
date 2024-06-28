@@ -90,7 +90,7 @@ class Vec3 {
   static Cross(a: Vec3, b: Vec3): Vec3 {
     return new Vec3(
       a.y * b.z - a.z * b.y,
-      a.z * b.x * a.x * b.z,
+      a.z * b.x - a.x * b.z,
       a.x * b.y - a.y * b.x
     )
   }
@@ -116,5 +116,15 @@ class Vec3 {
       .dot(matrices.translation)
 
     return new Vec3(...mutated.toArray())
+  }
+
+  project(matrix: Matrix): Vec3 {
+    const mat: Matrix = Matrix.FromArr([...this, 1])
+    const projectedMat: Matrix = mat.dot(matrix)
+    const projectedArr: number[] = projectedMat.toArray()
+    const projected: Vec3 = new Vec3(...projectedArr)
+    const w: number = projectedArr[3]
+    if (w != 0) Vec3.Scale(projected, 1 / w)
+    return projected
   }
 }
