@@ -28,9 +28,11 @@ function drawLoop(timestamp: number = 0): void {
 
   graphics.bg()
 
-  const mutatedTriangles: Triangle[] = cube.applyMatrices()
-  const filtered: Triangle[] = mutatedTriangles.filter(triangle => {
-    return triangle.getNormal().dot(triangle.p1.sub(cameraPos)) < 0
+  const mutatedMesh: Mesh = cube.applyMatrices()
+
+  const mutatedTriangles: MeshTriangle[] = mutatedMesh.triangles
+  const filtered: MeshTriangle[] = mutatedTriangles.filter(triangle => {
+    return triangle.getNormal().dot(triangle.getP1().sub(cameraPos)) < 0
   })
 
   for (const triangle of filtered) {
@@ -40,9 +42,7 @@ function drawLoop(timestamp: number = 0): void {
     const s: string = Math.round(lerp(dp, 0, 1, 10, 250)).toString(16)
     graphics.fillStyle = '#' + s + s + s
 
-    const projectedTriangle: Triangle = triangle.project(projectionMatrix)
-
-
+    const projectedTriangle: Triangle = triangle.toTriangle().project(projectionMatrix)
 
     graphics.triangleToScreenSpace(projectedTriangle)
   }
