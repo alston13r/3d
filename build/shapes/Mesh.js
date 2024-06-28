@@ -19,21 +19,22 @@ class Mesh {
         }
         return this;
     }
+    copyTrianglesToMesh(targetMesh) {
+        targetMesh.triangles.length = 0;
+        for (const [i, triangle] of this.triangles.entries()) {
+            targetMesh.triangles[i] = new MeshTriangle(targetMesh, i, triangle.p1, triangle.p2, triangle.p3);
+        }
+        return targetMesh;
+    }
     generateNormals() {
         for (const [i, triangle] of this.triangles.entries()) {
             this.normals[i] = triangle.getNormal();
         }
         return this;
     }
-    mutateTriangles(matrices) {
+    applyMatrices(matrices) {
         const mutatedVec3s = this.points.map(v => v.applyMatrices(matrices));
-        const mutatedTriangles = this.triangles.map(triangle => {
-            return new Triangle(mutatedVec3s[triangle.p1], mutatedVec3s[triangle.p2], mutatedVec3s[triangle.p3]);
-        });
-        return mutatedTriangles;
-    }
-    mutateNormals(matrices) {
-        return this.normals.map(v => v.applyMatrices(matrices));
+        return this.copyTrianglesToMesh(new Mesh(mutatedVec3s)).generateNormals();
     }
 }
 class MeshTriangle {
@@ -65,6 +66,19 @@ class MeshTriangle {
         const L1 = p2.sub(p1);
         const L2 = p3.sub(p1);
         return L1.cross(L2).normal();
+    }
+    draw(graphics) {
+        graphics.triangleFromVec3(this.getP1(), this.getP2(), this.getP3());
+    }
+    project(matrix) {
+        return [
+            this.getP1().project(matrix),
+            this.getP2().project(matrix),
+            this.getP3().project(matrix)
+        ];
+    }
+    toTriangle() {
+        return new Triangle(this.getP1(), this.getP2(), this.getP3());
     }
 }
 //# sourceMappingURL=Mesh.js.map
