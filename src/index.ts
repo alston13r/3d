@@ -42,7 +42,7 @@ function drawLoop(timestamp: number = 0): void {
     const s: string = Math.round(lerp(dp, 0, 1, 10, 250)).toString(16)
     graphics.fillStyle = '#' + s + s + s
 
-    const projectedTriangle: Triangle = triangle.toTriangle().project(projectionMatrix)
+    const projectedTriangle: Triangle = triangle.project(projectionMatrix)
 
     graphics.triangleToScreenSpace(projectedTriangle)
   }

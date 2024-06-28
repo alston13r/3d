@@ -79,19 +79,8 @@ class MeshTriangle {
     return L1.cross(L2).normal()
   }
 
-  draw(graphics: Graphics): void {
-    graphics.triangleFromVec3(this.getP1(), this.getP2(), this.getP3())
-  }
-
-  project(matrix: Matrix): [Vec3, Vec3, Vec3] {
-    return [
-      this.getP1().project(matrix),
-      this.getP2().project(matrix),
-      this.getP3().project(matrix)
-    ]
-  }
-
-  toTriangle(): Triangle {
+  project(matrix: Matrix): Triangle {
     return new Triangle(this.getP1(), this.getP2(), this.getP3())
+      .project(matrix)
   }
 }
