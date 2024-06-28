@@ -76,29 +76,20 @@ class Vec3 {
     cross(v) {
         return Vec3.Cross(this, v);
     }
-    project(matrices) {
+    applyMatrices(matrices) {
         matrices.identity ||= Matrix.MakeIdentity();
         matrices.scale ||= Matrix.MakeIdentity();
         matrices.rotation ||= Matrix.MakeIdentity();
         matrices.orbital ||= Matrix.MakeIdentity();
         matrices.translation ||= Matrix.MakeIdentity();
         const vecMat = Matrix.FromArr([this.x, this.y, this.z, 1]);
-        const projected = vecMat
+        const mutated = vecMat
             .dot(matrices.identity)
             .dot(matrices.scale)
             .dot(matrices.rotation)
             .dot(matrices.orbital)
-            .dot(matrices.translation)
-            .dot(matrices.projection);
-        const outputVecArr = projected.toArray();
-        const outputVec = new Vec3(...outputVecArr);
-        const w = outputVecArr[3];
-        if (w != 0) {
-            outputVec.x /= w;
-            outputVec.y /= w;
-            outputVec.z /= w;
-        }
-        return outputVec;
+            .dot(matrices.translation);
+        return new Vec3(...mutated.toArray());
     }
 }
 //# sourceMappingURL=Vec3.js.map

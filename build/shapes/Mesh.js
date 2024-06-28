@@ -25,25 +25,15 @@ class Mesh {
         }
         return this;
     }
-    projectTriangles(matrices) {
-        matrices.identity ||= Matrix.MakeIdentity();
-        matrices.scale ||= Matrix.MakeIdentity();
-        matrices.rotation ||= Matrix.MakeIdentity();
-        matrices.orbital ||= Matrix.MakeIdentity();
-        matrices.translation ||= Matrix.MakeIdentity();
-        const projectedVec3s = this.points.map(v => v.project(matrices));
-        const projectedTriangles = this.triangles.map(triangle => {
-            return new Triangle(projectedVec3s[triangle.p1], projectedVec3s[triangle.p2], projectedVec3s[triangle.p3]);
+    mutateTriangles(matrices) {
+        const mutatedVec3s = this.points.map(v => v.applyMatrices(matrices));
+        const mutatedTriangles = this.triangles.map(triangle => {
+            return new Triangle(mutatedVec3s[triangle.p1], mutatedVec3s[triangle.p2], mutatedVec3s[triangle.p3]);
         });
-        return projectedTriangles;
+        return mutatedTriangles;
     }
-    projectNormals(matrices) {
-        matrices.identity ||= Matrix.MakeIdentity();
-        matrices.scale ||= Matrix.MakeIdentity();
-        matrices.rotation ||= Matrix.MakeIdentity();
-        matrices.orbital ||= Matrix.MakeIdentity();
-        matrices.translation ||= Matrix.MakeIdentity();
-        return this.normals.map(v => v.project(matrices));
+    mutateNormals(matrices) {
+        return this.normals.map(v => v.applyMatrices(matrices));
     }
 }
 class MeshTriangle {
