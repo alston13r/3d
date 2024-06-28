@@ -22,6 +22,14 @@ class Mesh {
     return this
   }
 
+  copyTrianglesToMesh(targetMesh: Mesh): Mesh {
+    targetMesh.triangles.length = 0
+    for (const [i, triangle] of this.triangles.entries()) {
+      targetMesh.triangles[i] = new MeshTriangle(targetMesh, i, triangle.p1, triangle.p2, triangle.p3)
+    }
+    return targetMesh
+  }
+
   generateNormals(): Mesh {
     for (const [i, triangle] of this.triangles.entries()) {
       this.normals[i] = triangle.getNormal()
@@ -29,21 +37,9 @@ class Mesh {
     return this
   }
 
-  mutateTriangles(matrices: MutationMatrices): Triangle[] {
+  applyMatrices(matrices: MutationMatrices): Mesh {
     const mutatedVec3s: Vec3[] = this.points.map(v => v.applyMatrices(matrices))
-    const mutatedTriangles: Triangle[] = this.triangles.map(triangle => {
-      return new Triangle(
-        mutatedVec3s[triangle.p1],
-        mutatedVec3s[triangle.p2],
-        mutatedVec3s[triangle.p3]
-      )
-    })
-
-    return mutatedTriangles
-  }
-
-  mutateNormals(matrices: MutationMatrices): Vec3[] {
-    return this.normals.map(v => v.applyMatrices(matrices))
+    return this.copyTrianglesToMesh(new Mesh(mutatedVec3s)).generateNormals()
   }
 }
 
@@ -81,5 +77,21 @@ class MeshTriangle {
     const L1: Vec3 = p2.sub(p1)
     const L2: Vec3 = p3.sub(p1)
     return L1.cross(L2).normal()
+  }
+
+  draw(graphics: Graphics): void {
+    graphics.triangleFromVec3(this.getP1(), this.getP2(), this.getP3())
+  }
+
+  project(matrix: Matrix): [Vec3, Vec3, Vec3] {
+    return [
+      this.getP1().project(matrix),
+      this.getP2().project(matrix),
+      this.getP3().project(matrix)
+    ]
+  }
+
+  toTriangle(): Triangle {
+    return new Triangle(this.getP1(), this.getP2(), this.getP3())
   }
 }
