@@ -13,6 +13,9 @@ class Triangle {
         const L2 = this.p3.sub(this.p1);
         return L1.cross(L2).normal();
     }
+    project(matrix) {
+        return new Triangle(this.p1.project(matrix), this.p2.project(matrix), this.p3.project(matrix));
+    }
     draw(graphics) {
         graphics.triangleFromVec3(this.p1, this.p2, this.p3);
     }

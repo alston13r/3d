@@ -76,7 +76,7 @@ class Graphics {
             .lineTo(x2, y2)
             .lineTo(x3, y3)
             .closePath()
-            .stroke();
+            .fill();
     }
     triangleFromVec3(p1, p2, p3) {
         this.triangle(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);
