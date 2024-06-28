@@ -47,11 +47,10 @@ function createTranslationMat(translation: Vec3): Matrix {
   ])
 }
 
-type ProjectionMatrices = {
+type MutationMatrices = {
   identity?: Matrix
   scale?: Matrix
   rotation?: Matrix
   orbital?: Matrix
   translation?: Matrix
-  projection: Matrix
 }

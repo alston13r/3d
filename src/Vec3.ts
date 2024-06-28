@@ -99,7 +99,7 @@ class Vec3 {
     return Vec3.Cross(this, v)
   }
 
-  project(matrices: ProjectionMatrices): Vec3 {
+  applyMatrices(matrices: MutationMatrices): Vec3 {
     matrices.identity ||= Matrix.MakeIdentity()
     matrices.scale ||= Matrix.MakeIdentity()
     matrices.rotation ||= Matrix.MakeIdentity()
@@ -108,25 +108,13 @@ class Vec3 {
 
     const vecMat: Matrix = Matrix.FromArr([this.x, this.y, this.z, 1])
 
-    const projected: Matrix = vecMat
+    const mutated: Matrix = vecMat
       .dot(matrices.identity)
       .dot(matrices.scale)
       .dot(matrices.rotation)
       .dot(matrices.orbital)
       .dot(matrices.translation)
-      .dot(matrices.projection)
 
-    const outputVecArr: number[] = projected.toArray()
-    const outputVec: Vec3 = new Vec3(...outputVecArr)
-
-    const w: number = outputVecArr[3]
-
-    if (w != 0) {
-      outputVec.x /= w
-      outputVec.y /= w
-      outputVec.z /= w
-    }
-
-    return outputVec
+    return new Vec3(...mutated.toArray())
   }
 }

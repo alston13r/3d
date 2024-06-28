@@ -50,8 +50,8 @@ class Cube {
     return this
   }
 
-  applyMatrices(projectionMatrix: Matrix): Triangle[] {
-    return this.mesh.projectTriangles({
+  applyMatrices(): Triangle[] {
+    return this.mesh.mutateTriangles({
       scale: Matrix.FromArr([
         [this.scale.x, 0, 0, 0],
         [0, this.scale.y, 0, 0],
@@ -61,8 +61,7 @@ class Cube {
       translation: createTranslationMat(this.position),
       rotation: createRotMatZ(this.rotation.z)
         .dot(createRotMatY(this.rotation.y))
-        .dot(createRotMatX(this.rotation.x)),
-      projection: projectionMatrix
+        .dot(createRotMatX(this.rotation.x))
     })
   }
 }

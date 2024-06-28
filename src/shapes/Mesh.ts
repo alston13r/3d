@@ -29,33 +29,21 @@ class Mesh {
     return this
   }
 
-  projectTriangles(matrices: ProjectionMatrices): Triangle[] {
-    matrices.identity ||= Matrix.MakeIdentity()
-    matrices.scale ||= Matrix.MakeIdentity()
-    matrices.rotation ||= Matrix.MakeIdentity()
-    matrices.orbital ||= Matrix.MakeIdentity()
-    matrices.translation ||= Matrix.MakeIdentity()
-
-    const projectedVec3s: Vec3[] = this.points.map(v => v.project(matrices))
-    const projectedTriangles: Triangle[] = this.triangles.map(triangle => {
+  mutateTriangles(matrices: MutationMatrices): Triangle[] {
+    const mutatedVec3s: Vec3[] = this.points.map(v => v.applyMatrices(matrices))
+    const mutatedTriangles: Triangle[] = this.triangles.map(triangle => {
       return new Triangle(
-        projectedVec3s[triangle.p1],
-        projectedVec3s[triangle.p2],
-        projectedVec3s[triangle.p3]
+        mutatedVec3s[triangle.p1],
+        mutatedVec3s[triangle.p2],
+        mutatedVec3s[triangle.p3]
       )
     })
 
-    return projectedTriangles
+    return mutatedTriangles
   }
 
-  projectNormals(matrices: ProjectionMatrices): Vec3[] {
-    matrices.identity ||= Matrix.MakeIdentity()
-    matrices.scale ||= Matrix.MakeIdentity()
-    matrices.rotation ||= Matrix.MakeIdentity()
-    matrices.orbital ||= Matrix.MakeIdentity()
-    matrices.translation ||= Matrix.MakeIdentity()
-
-    return this.normals.map(v => v.project(matrices))
+  mutateNormals(matrices: MutationMatrices): Vec3[] {
+    return this.normals.map(v => v.applyMatrices(matrices))
   }
 }
 
