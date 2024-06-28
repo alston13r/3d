@@ -1,5 +1,6 @@
 const cube: Cube = new Cube()
-  .translate(new Vec3(2, -2, 3))
+  .translate(new Vec3(-2, 0, 2))
+  .rotate(0, 0.2, 0.5)
 
 const graphics: Graphics = new Graphics().appendTo(document.body)
 
@@ -14,7 +15,7 @@ function drawLoop(timestamp: number = 0): void {
 
 
 
-  cube.rotate(deltaTime / 1000, 0, deltaTime / 1000)
+  cube.rotate(deltaTime / 1000, 0, 0)
 
 
 
