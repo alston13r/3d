@@ -50,8 +50,8 @@ class Cube {
     return this
   }
 
-  applyMatrices(): Triangle[] {
-    return this.mesh.mutateTriangles({
+  applyMatrices(): Mesh {
+    return this.mesh.applyMatrices({
       scale: Matrix.FromArr([
         [this.scale.x, 0, 0, 0],
         [0, this.scale.y, 0, 0],
