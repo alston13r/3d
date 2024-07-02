@@ -108,4 +108,12 @@ class Vec2 {
   cross(v: Vec2): number {
     return Vec2.Cross(this, v)
   }
+
+  static Cast(a: Vec2, b: Vec2): Vec2 {
+    return b.normal().scale(a.dot(b))
+  }
+
+  castOnto(v: Vec2): Vec2 {
+    return Vec2.Cast(this, v)
+  }
 }

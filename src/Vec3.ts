@@ -127,4 +127,12 @@ class Vec3 {
     if (w != 0) Vec3.Scale(projected, 1 / w)
     return projected
   }
+
+  static Cast(a: Vec3, b: Vec3): Vec3 {
+    return b.normal().scale(a.dot(b))
+  }
+
+  castOnto(v: Vec3): Vec3 {
+    return Vec3.Cast(this, v)
+  }
 }
