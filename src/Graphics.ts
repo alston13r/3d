@@ -77,8 +77,16 @@ class Graphics {
     return this
   }
 
+  get fillStyle(): string {
+    return this.context.fillStyle as string
+  }
+
   set fillStyle(c: string) {
     this.context.fillStyle = c
+  }
+
+  get strokeStyle(): string {
+    return this.context.strokeStyle as string
   }
 
   set strokeStyle(c: string) {
@@ -86,6 +94,19 @@ class Graphics {
   }
 
   triangle(x1: number, y1: number, x2: number, y2: number, x3: number, y3: number): void {
+    // triangle inflation, this is to try to reduce the gaps between touching
+    // triangles, doesn't really look that great since corners get pointy
+
+    // const xc: number = (x1 + x2 + x3) / 3
+    // const yc: number = (y1 + y2 + y3) / 3
+
+    // x1 = xc + (x1 - xc) * 1.02
+    // x2 = xc + (x2 - xc) * 1.02
+    // x3 = xc + (x3 - xc) * 1.02
+    // y1 = yc + (y1 - yc) * 1.02
+    // y2 = yc + (y2 - yc) * 1.02
+    // y3 = yc + (y3 - yc) * 1.02
+
     this.beginPath()
       .moveTo(x1, y1)
       .lineTo(x2, y2)
@@ -108,7 +129,7 @@ class Graphics {
       (triangle.p2.x + 1) * 0.5 * width,
       (triangle.p2.y + 1) * 0.5 * height,
       (triangle.p3.x + 1) * 0.5 * width,
-      (triangle.p3.y + 1) * 0.5 * height,
+      (triangle.p3.y + 1) * 0.5 * height
     )
   }
 
