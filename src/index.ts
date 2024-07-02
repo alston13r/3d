@@ -39,18 +39,14 @@ function drawLoop(timestamp: number = 0): void {
     const normal: Vec3 = triangle.getNormal()
     const dp: number = lightDir.dot(normal)
 
-    const s: string = Math.round(lerp(dp, 0, 1, 10, 250)).toString(16)
-    graphics.fillStyle = '#' + s + s + s
+    const s: string = Math.round(dp * 255).toString(16)
+    const sMod: string = s.length == 1 ? '0' + s : s
+    graphics.fillStyle = '#' + sMod + sMod + sMod
 
     const projectedTriangle: Triangle = triangle.project(projectionMatrix)
 
     graphics.triangleToScreenSpace(projectedTriangle)
   }
-
-
-
-
-
 
   window.requestAnimationFrame(drawLoop)
 }
