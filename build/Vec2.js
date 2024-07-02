@@ -86,5 +86,11 @@ class Vec2 {
     cross(v) {
         return Vec2.Cross(this, v);
     }
+    static Cast(a, b) {
+        return b.normal().scale(a.dot(b));
+    }
+    castOnto(v) {
+        return Vec2.Cast(this, v);
+    }
 }
 //# sourceMappingURL=Vec2.js.map

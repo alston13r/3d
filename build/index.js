@@ -21,8 +21,9 @@ function drawLoop(timestamp = 0) {
     for (const triangle of filtered) {
         const normal = triangle.getNormal();
         const dp = lightDir.dot(normal);
-        const s = Math.round(lerp(dp, 0, 1, 10, 250)).toString(16);
-        graphics.fillStyle = '#' + s + s + s;
+        const s = Math.round(dp * 255).toString(16);
+        const sMod = s.length == 1 ? '0' + s : s;
+        graphics.fillStyle = '#' + sMod + sMod + sMod;
         const projectedTriangle = triangle.project(projectionMatrix);
         graphics.triangleToScreenSpace(projectedTriangle);
     }

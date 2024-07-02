@@ -101,5 +101,11 @@ class Vec3 {
             Vec3.Scale(projected, 1 / w);
         return projected;
     }
+    static Cast(a, b) {
+        return b.normal().scale(a.dot(b));
+    }
+    castOnto(v) {
+        return Vec3.Cast(this, v);
+    }
 }
 //# sourceMappingURL=Vec3.js.map
