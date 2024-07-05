@@ -105,6 +105,7 @@ class Vec3 {
     matrices.rotation ||= Matrix.MakeIdentity()
     matrices.orbital ||= Matrix.MakeIdentity()
     matrices.translation ||= Matrix.MakeIdentity()
+    matrices.camera ||= Matrix.MakeIdentity()
 
     const vecMat: Matrix = Matrix.FromArr([this.x, this.y, this.z, 1])
 
@@ -114,6 +115,7 @@ class Vec3 {
       .dot(matrices.rotation)
       .dot(matrices.orbital)
       .dot(matrices.translation)
+      .dot(matrices.camera)
 
     return new Vec3(...mutated.toArray())
   }
@@ -134,5 +136,17 @@ class Vec3 {
 
   castOnto(v: Vec3): Vec3 {
     return Vec3.Cast(this, v)
+  }
+
+  static RotateAround(v: Vec3, axis: Vec3, theta: number): Vec3 {
+    const cos: number = Math.cos(-theta / 2)
+    const sin: number = Math.sin(-theta / 2)
+
+    const q: Quaternion = new Quaternion(cos, axis.normal().scale(sin))
+    const qi: Quaternion = q.inverse()
+
+    const p: Quaternion = new Quaternion(0, v)
+    const pRot: Quaternion = q.mul(p).mul(qi)
+    return Vec3.CopyFrom(v, pRot.imaginary)
   }
 }

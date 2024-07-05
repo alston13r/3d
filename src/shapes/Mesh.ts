@@ -3,7 +3,7 @@ class Mesh {
   triangles: MeshTriangle[] = []
   normals: Vec3[] = []
 
-  constructor(points: Vec3[]) {
+  constructor(points: Vec3[] = []) {
     this.points = points.map(v => v.copy())
   }
 
@@ -13,6 +13,15 @@ class Mesh {
       return [prev[0] + curr.x / length, prev[1] + curr.y / length, prev[2] + curr.z / length]
     }, [0, 0, 0])
     return new Vec3(xAvg, yAvg, zAvg)
+  }
+
+  centerPoints(): Mesh {
+    const center: Vec3 = this.getCenter()
+
+    this.points.forEach(point => Vec3.Sub(point, center))
+    this.generateNormals()
+
+    return this
   }
 
   generateTriangles(triangles: [number, number, number][]): Mesh {

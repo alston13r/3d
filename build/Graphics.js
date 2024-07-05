@@ -100,7 +100,7 @@ class Graphics {
     triangleToScreenSpace(triangle) {
         const width = this.width;
         const height = this.height;
-        this.triangle((triangle.p1.x + 1) * 0.5 * width, (triangle.p1.y + 1) * 0.5 * height, (triangle.p2.x + 1) * 0.5 * width, (triangle.p2.y + 1) * 0.5 * height, (triangle.p3.x + 1) * 0.5 * width, (triangle.p3.y + 1) * 0.5 * height);
+        this.triangle((triangle.p1.x + 1) * 0.5 * width, height - (triangle.p1.y + 1) * 0.5 * height, (triangle.p2.x + 1) * 0.5 * width, height - (triangle.p2.y + 1) * 0.5 * height, (triangle.p3.x + 1) * 0.5 * width, height - (triangle.p3.y + 1) * 0.5 * height);
     }
     createProjectionMatrix(fov = 90, zFar = 1000, zNear = 0.1) {
         const asp = this.aspHW;

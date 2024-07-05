@@ -82,13 +82,15 @@ class Vec3 {
         matrices.rotation ||= Matrix.MakeIdentity();
         matrices.orbital ||= Matrix.MakeIdentity();
         matrices.translation ||= Matrix.MakeIdentity();
+        matrices.camera ||= Matrix.MakeIdentity();
         const vecMat = Matrix.FromArr([this.x, this.y, this.z, 1]);
         const mutated = vecMat
             .dot(matrices.identity)
             .dot(matrices.scale)
             .dot(matrices.rotation)
             .dot(matrices.orbital)
-            .dot(matrices.translation);
+            .dot(matrices.translation)
+            .dot(matrices.camera);
         return new Vec3(...mutated.toArray());
     }
     project(matrix) {
@@ -106,6 +108,15 @@ class Vec3 {
     }
     castOnto(v) {
         return Vec3.Cast(this, v);
+    }
+    static RotateAround(v, axis, theta) {
+        const cos = Math.cos(-theta / 2);
+        const sin = Math.sin(-theta / 2);
+        const q = new Quaternion(cos, axis.normal().scale(sin));
+        const qi = q.inverse();
+        const p = new Quaternion(0, v);
+        const pRot = q.mul(p).mul(qi);
+        return Vec3.CopyFrom(v, pRot.imaginary);
     }
 }
 //# sourceMappingURL=Vec3.js.map
