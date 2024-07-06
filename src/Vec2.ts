@@ -1,4 +1,7 @@
 class Vec2 {
+  static iHat: Vec2 = new Vec2(1, 0)
+  static jHat: Vec2 = new Vec2(0, 1)
+
   x: number
   y: number
 

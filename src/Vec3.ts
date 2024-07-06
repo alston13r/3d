@@ -1,4 +1,8 @@
 class Vec3 {
+  static iHat: Vec3 = new Vec3(1, 0, 0)
+  static jHat: Vec3 = new Vec3(0, 1, 0)
+  static kHat: Vec3 = new Vec3(0, 0, 1)
+
   x: number
   y: number
   z: number
