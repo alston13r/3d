@@ -107,6 +107,10 @@ class Graphics {
     this.triangle(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y)
   }
 
+  triangleFromInstance(triangle: Triangle): void {
+    this.triangleFromVec3(...triangle.tuple())
+  }
+
   triangleToScreenSpace(triangle: Triangle): Triangle {
     const width: number = this.width
     const height: number = this.height
