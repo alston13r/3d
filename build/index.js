@@ -172,7 +172,7 @@ function drawLoop(timestamp = 0) {
             }
         }
         for (const clipped of arr) {
-            graphics.triangleFromVec3(...clipped.tuple());
+            graphics.triangleFromInstance(clipped);
         }
     }
     window.requestAnimationFrame(drawLoop);

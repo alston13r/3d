@@ -1,5 +1,7 @@
 "use strict";
 class Vec2 {
+    static iHat = new Vec2(1, 0);
+    static jHat = new Vec2(0, 1);
     x;
     y;
     constructor(x = 0, y = 0) {

@@ -88,6 +88,9 @@ class Graphics {
     triangleFromVec3(p1, p2, p3) {
         this.triangle(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);
     }
+    triangleFromInstance(triangle) {
+        this.triangleFromVec3(...triangle.tuple());
+    }
     triangleToScreenSpace(triangle) {
         const width = this.width;
         const height = this.height;

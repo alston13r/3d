@@ -1,5 +1,8 @@
 "use strict";
 class Vec3 {
+    static iHat = new Vec3(1, 0, 0);
+    static jHat = new Vec3(0, 1, 0);
+    static kHat = new Vec3(0, 0, 1);
     x;
     y;
     z;
