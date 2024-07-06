@@ -77,21 +77,12 @@ class Graphics {
         this.context.strokeStyle = c;
     }
     triangle(x1, y1, x2, y2, x3, y3) {
-        // triangle inflation, this is to try to reduce the gaps between touching
-        // triangles, doesn't really look that great since corners get pointy
-        // const xc: number = (x1 + x2 + x3) / 3
-        // const yc: number = (y1 + y2 + y3) / 3
-        // x1 = xc + (x1 - xc) * 1.02
-        // x2 = xc + (x2 - xc) * 1.02
-        // x3 = xc + (x3 - xc) * 1.02
-        // y1 = yc + (y1 - yc) * 1.02
-        // y2 = yc + (y2 - yc) * 1.02
-        // y3 = yc + (y3 - yc) * 1.02
         this.beginPath()
             .moveTo(x1, y1)
             .lineTo(x2, y2)
             .lineTo(x3, y3)
             .closePath()
+            .stroke()
             .fill();
     }
     triangleFromVec3(p1, p2, p3) {
@@ -100,7 +91,7 @@ class Graphics {
     triangleToScreenSpace(triangle) {
         const width = this.width;
         const height = this.height;
-        this.triangle((triangle.p1.x + 1) * 0.5 * width, height - (triangle.p1.y + 1) * 0.5 * height, (triangle.p2.x + 1) * 0.5 * width, height - (triangle.p2.y + 1) * 0.5 * height, (triangle.p3.x + 1) * 0.5 * width, height - (triangle.p3.y + 1) * 0.5 * height);
+        return new Triangle(new Vec3((triangle.p1.x + 1) * 0.5 * width, height - (triangle.p1.y + 1) * 0.5 * height, triangle.p1.z), new Vec3((triangle.p2.x + 1) * 0.5 * width, height - (triangle.p2.y + 1) * 0.5 * height, triangle.p2.z), new Vec3((triangle.p3.x + 1) * 0.5 * width, height - (triangle.p3.y + 1) * 0.5 * height, triangle.p3.z));
     }
     createProjectionMatrix(fov = 90, zFar = 1000, zNear = 0.1) {
         const asp = this.aspHW;

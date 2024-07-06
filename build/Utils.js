@@ -2,6 +2,9 @@
 function lerp(x, a, b, c, d) {
     return (x - a) / (b - a) * (d - c) + c;
 }
+function clamp(x, min, max) {
+    return Math.max(min, Math.min(max, x));
+}
 function createRotMatX(theta) {
     const cos = Math.cos(theta);
     const sin = Math.sin(theta);
