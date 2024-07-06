@@ -2,6 +2,10 @@ function lerp(x: number, a: number, b: number, c: number, d: number): number {
   return (x - a) / (b - a) * (d - c) + c
 }
 
+function clamp(x: number, min: number, max: number): number {
+  return Math.max(min, Math.min(max, x))
+}
+
 type MutationMatrices = {
   identity?: Matrix
   scale?: Matrix
