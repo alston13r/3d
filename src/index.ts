@@ -216,39 +216,23 @@ function drawLoop(timestamp: number = 0): void {
 
         switch (i) {
           case 0:
-            arr.push(...clipTriangleAgainstPlane(
-              new Vec3(0, 0, 0),
-              new Vec3(1, 0, 0),
-              clipping
-            ))
+            arr.push(...clipTriangleAgainstPlane(new Vec3(0, 0, 0), new Vec3(1, 0, 0), clipping))
             break
           case 1:
-            arr.push(...clipTriangleAgainstPlane(
-              new Vec3(0, 0, 0),
-              new Vec3(0, 1, 0),
-              clipping
-            ))
+            arr.push(...clipTriangleAgainstPlane(new Vec3(0, 0, 0), new Vec3(0, 1, 0), clipping))
             break
           case 2:
-            arr.push(...clipTriangleAgainstPlane(
-              new Vec3(graphics.width, 0, 0),
-              new Vec3(-1, 0, 0),
-              clipping
-            ))
+            arr.push(...clipTriangleAgainstPlane(new Vec3(graphics.width, 0, 0), new Vec3(-1, 0, 0), clipping))
             break
           case 3:
-            arr.push(...clipTriangleAgainstPlane(
-              new Vec3(0, graphics.height, 0),
-              new Vec3(0, -1, 0),
-              clipping
-            ))
+            arr.push(...clipTriangleAgainstPlane(new Vec3(0, graphics.height, 0), new Vec3(0, -1, 0), clipping))
             break
         }
       }
     }
 
     for (const clipped of arr) {
-      graphics.triangleFromVec3(...clipped.tuple())
+      graphics.triangleFromInstance(clipped)
     }
   }
 
