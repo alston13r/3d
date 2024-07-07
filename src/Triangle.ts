@@ -46,6 +46,6 @@ class Triangle {
   }
 
   draw(graphics: Graphics): void {
-    graphics.triangleFromVec3(this.p1, this.p2, this.p3)
+    graphics.triangleFromInstance(this)
   }
 }

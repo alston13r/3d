@@ -103,12 +103,8 @@ class Graphics {
       .fill()
   }
 
-  triangleFromVec3(p1: Vec3, p2: Vec3, p3: Vec3): void {
-    this.triangle(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y)
-  }
-
   triangleFromInstance(triangle: Triangle): void {
-    this.triangleFromVec3(...triangle.tuple())
+    this.triangle(triangle.p1.x, triangle.p1.y, triangle.p2.x, triangle.p2.y, triangle.p3.x, triangle.p3.y)
   }
 
   triangleToScreenSpace(triangle: Triangle): Triangle {
