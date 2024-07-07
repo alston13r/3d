@@ -38,6 +38,7 @@ function loadInputs() {
     Vec3.Add(cameraPos, cameraUp.normal().scale(UD * 0.02));
     Vec3.RotateAround(cameraDir, cameraUp, Y * 0.01);
     Vec3.RotateAround(cameraDir, right, P * 0.01);
+    Vec3.RotateAround(cameraUp, right, P * 0.01);
 }
 function logTriangle(tri, t) {
     if (t)
@@ -49,10 +50,6 @@ function logTriangle(tri, t) {
 graphics.context.font = 'arial 10px';
 graphics.context.textAlign = 'left';
 graphics.context.textBaseline = 'top';
-function text(t, x, y) {
-    graphics.fillStyle = '#fff';
-    graphics.context.fillText(t, x, y);
-}
 function getLightColor(dp) {
     const x = clamp(Math.round(dp * 255), 30, 250);
     return new Color(x, x, x).toString();
@@ -112,7 +109,6 @@ function drawLoop(timestamp = 0) {
     theta += deltaTime / 1000;
     theta %= 2 * Math.PI;
     loadInputs();
-    graphics.createFrame();
     graphics.bg();
     const rotationMatrix = createRotMatQuaternion(new Vec3(1, 0, 0), theta);
     const translationMatrix = createTranslationMat(new Vec3(0, 0, 3));
@@ -122,12 +118,15 @@ function drawLoop(timestamp = 0) {
     const viewMatrix = invertLookAtMatrix(createLookAtMatrix(cameraPos, cameraPos.add(cameraDir), cameraUp));
     graphics.strokeStyle = '#fff';
     const raster = [];
+    let i = 0;
     for (const tri of cube.mesh.triangles) {
         const triangle = new Triangle(tri.getP1(), tri.getP2(), tri.getP3());
         const transformedTriangle = triangle.applyMatrix(worldMatrix);
-        const normal = transformedTriangle.getNormal();
         const cameraRay = transformedTriangle.p1.sub(cameraPos);
-        if (normal.dot(cameraRay) < 0) { // triangle is visible
+        if (cameraRay.dot(cameraDir) < 0)
+            continue; // triangle is behind camera
+        const normal = transformedTriangle.getNormal();
+        if (normal.dot(cameraRay) < 0) { // triangle face is visible
             const dp = lightDir.dot(normal);
             const color = getLightColor(dp);
             // view
@@ -179,7 +178,6 @@ function drawLoop(timestamp = 0) {
             graphics.triangleFromInstance(clipped);
         }
     }
-    graphics.disposeFrame();
     window.requestAnimationFrame(drawLoop);
 }
 window.requestAnimationFrame(drawLoop);

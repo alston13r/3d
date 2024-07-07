@@ -62,7 +62,7 @@ function createRotMatQuaternion(axis, theta) {
 }
 function createLookAtMatrix(pos, target, up) {
     const newFront = target.sub(pos).normal();
-    const a = newFront.scale(up.dot(newFront));
+    const a = newFront.scale(up.normal().dot(newFront));
     const newUp = up.sub(a).normal();
     const newRight = newUp.cross(newFront);
     return Matrix.FromArr([

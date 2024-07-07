@@ -1,28 +1,17 @@
 "use strict";
-class MutableShape {
+class MutableShape extends MutableObject {
     mesh;
     position = new Vec3();
     scale = new Vec3(1, 1, 1);
     orientation = Matrix.MakeIdentity();
     constructor(points, triangles) {
+        super();
         this.mesh = new Mesh(points)
             .generateTriangles(triangles)
             .generateNormals();
     }
     centerPoints() {
         this.mesh.centerPoints();
-        return this;
-    }
-    translate(translation) {
-        Vec3.Add(this.position, translation);
-        return this;
-    }
-    moveTo(position) {
-        Vec3.CopyFrom(this.position, position);
-        return this;
-    }
-    rotate(axis, theta) {
-        Matrix.Dot(this.orientation, createRotMatQuaternion(axis, theta));
         return this;
     }
     stretch(x = 1, y = 1, z = 1) {
