@@ -5,7 +5,7 @@ interface Camera {
 }
 
 class Camera extends MutableObject {
-  lookAt(target: Vec3, roll?: number): Camera {
+  pointTo(target: Vec3, roll?: number): Camera {
     this.orientation = Matrix.MakeIdentity()
 
     const diff: Vec3 = target.sub(this.position)
@@ -18,5 +18,9 @@ class Camera extends MutableObject {
     if (roll) this.rotate(this.getFront(), roll)
 
     return this
+  }
+
+  createLookAtMatrix(): Matrix {
+    return createLookAtMatrix(this.position, this.position.add(this.getFront()), this.getUp())
   }
 }
