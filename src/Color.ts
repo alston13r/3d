@@ -15,6 +15,10 @@ class Color {
     this.b = b
   }
 
+  static FromGrey(x: number = 0): Color {
+    return new Color(x, x, x)
+  }
+
   static FromString(str: string): Color {
     if (str.indexOf('#') == 0) str = str.substring(1)
 
