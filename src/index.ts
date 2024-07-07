@@ -49,6 +49,7 @@ function loadInputs(): void {
   Vec3.Add(cameraPos, cameraUp.normal().scale(UD * 0.02))
   Vec3.RotateAround(cameraDir, cameraUp, Y * 0.01)
   Vec3.RotateAround(cameraDir, right, P * 0.01)
+  Vec3.RotateAround(cameraUp, right, P * 0.01)
 }
 
 function logTriangle(tri: Triangle, t?: string): void {
@@ -61,11 +62,6 @@ function logTriangle(tri: Triangle, t?: string): void {
 graphics.context.font = 'arial 10px'
 graphics.context.textAlign = 'left'
 graphics.context.textBaseline = 'top'
-
-function text(t: string, x: number, y: number): void {
-  graphics.fillStyle = '#fff'
-  graphics.context.fillText(t, x, y)
-}
 
 function getLightColor(dp: number): string {
   const x: number = clamp(Math.round(dp * 255), 30, 250)
@@ -132,8 +128,6 @@ function drawLoop(timestamp: number = 0): void {
 
   loadInputs()
 
-  graphics.createFrame()
-
   graphics.bg()
 
 
@@ -150,13 +144,6 @@ function drawLoop(timestamp: number = 0): void {
 
   const viewMatrix: Matrix = invertLookAtMatrix(createLookAtMatrix(cameraPos, cameraPos.add(cameraDir), cameraUp))
 
-
-
-
-
-
-  graphics.strokeStyle = '#fff'
-
   const raster: { triangle: Triangle, color: string }[] = []
 
   for (const tri of cube.mesh.triangles) {
@@ -164,11 +151,13 @@ function drawLoop(timestamp: number = 0): void {
 
     const transformedTriangle: Triangle = triangle.applyMatrix(worldMatrix)
 
-    const normal: Vec3 = transformedTriangle.getNormal()
-
     const cameraRay: Vec3 = transformedTriangle.p1.sub(cameraPos)
 
-    if (normal.dot(cameraRay) < 0) { // triangle is visible
+    if (cameraRay.dot(cameraDir) < 0) continue // triangle is behind camera
+
+    const normal: Vec3 = transformedTriangle.getNormal()
+
+    if (normal.dot(cameraRay) < 0) { // triangle face is visible
       const dp: number = lightDir.dot(normal)
       const color: string = getLightColor(dp)
 
@@ -240,8 +229,6 @@ function drawLoop(timestamp: number = 0): void {
       graphics.triangleFromInstance(clipped)
     }
   }
-
-  graphics.disposeFrame()
 
   window.requestAnimationFrame(drawLoop)
 }
