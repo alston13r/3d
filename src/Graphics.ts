@@ -1,12 +1,16 @@
 class Graphics {
   canvas: HTMLCanvasElement
   context: CanvasRenderingContext2D
+  zBuffer: number[][]
+  colorBuffer: Color[][]
 
   constructor() {
     this.canvas = document.createElement('canvas')
     this.canvas.width = 800
     this.canvas.height = 600
     this.context = this.canvas.getContext('2d') as CanvasRenderingContext2D
+    this.zBuffer = new Array(800).fill(0).map(() => new Array(600).fill(farPlane))
+    this.colorBuffer = new Array(800).fill(0).map(() => new Array(600).fill(Color.Black))
   }
 
   appendTo(element: HTMLElement): Graphics {
@@ -17,6 +21,8 @@ class Graphics {
   setSize(width: number, height: number): Graphics {
     this.canvas.width = width
     this.canvas.height = height
+    this.zBuffer = new Array(width).fill(0).map(() => new Array(height).fill(farPlane))
+    this.colorBuffer = new Array(width).fill(0).map(() => new Array(height).fill(Color.Black))
     return this
   }
 
@@ -91,6 +97,42 @@ class Graphics {
 
   set strokeStyle(c: string) {
     this.context.strokeStyle = c
+  }
+
+  createFrame(): Graphics {
+    const width: number = this.width
+    const height: number = this.height
+
+    for (let x = 0; x < width; x++) {
+      for (let y = 0; y < height; y++) {
+        this.zBuffer[x][y] = farPlane
+        this.colorBuffer[x][y] = Color.Black
+      }
+    }
+
+    return this
+  }
+
+  disposeFrame(): Graphics {
+    const width: number = this.width
+    const height: number = this.height
+
+    const data: Uint8ClampedArray = new Uint8ClampedArray(width * height * 4)
+
+    for (let x = 0; x < width; x++) {
+      for (let y = 0; y < height; y++) {
+        const color: Color = this.colorBuffer[x][y]
+        const i: number = (x + y * width) * 4
+        data[i] = color.r
+        data[i + 1] = color.g
+        data[i + 2] = color.b
+        data[i + 3] = 255
+      }
+    }
+
+    this.context.putImageData(new ImageData(data, width), 0, 0)
+
+    return this
   }
 
   triangle(x1: number, y1: number, x2: number, y2: number, x3: number, y3: number): void {
