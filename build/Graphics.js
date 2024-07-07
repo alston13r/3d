@@ -106,14 +106,18 @@ class Graphics {
     rect(x, y, w, h) {
         this.context.fillRect(x, y, w, h);
     }
-    triangle(x1, y1, x2, y2, x3, y3) {
+    triangle(x1, y1, x2, y2, x3, y3, stroke = true, fill = true) {
+        if (!stroke && !fill)
+            return;
         this.beginPath()
             .moveTo(x1, y1)
             .lineTo(x2, y2)
             .lineTo(x3, y3)
-            .closePath()
-            .stroke()
-            .fill();
+            .closePath();
+        if (stroke)
+            this.stroke();
+        if (fill)
+            this.fill();
     }
     triangleFromInstance(triangle) {
         this.triangle(triangle.p1.x, triangle.p1.y, triangle.p2.x, triangle.p2.y, triangle.p3.x, triangle.p3.y);
@@ -123,7 +127,7 @@ class Graphics {
         const height = this.height;
         return new Triangle(new Vec3((triangle.p1.x + 1) * 0.5 * width, height - (triangle.p1.y + 1) * 0.5 * height, triangle.p1.z), new Vec3((triangle.p2.x + 1) * 0.5 * width, height - (triangle.p2.y + 1) * 0.5 * height, triangle.p2.z), new Vec3((triangle.p3.x + 1) * 0.5 * width, height - (triangle.p3.y + 1) * 0.5 * height, triangle.p3.z));
     }
-    createProjectionMatrix(fov = 90, zFar = 1000, zNear = 0.1) {
+    createProjectionMatrix(fov = 90, zNear = 0.1, zFar = 1000) {
         const asp = this.aspHW;
         fov = lerp(fov, 0, 360, 0, 2 * Math.PI);
         const f = 1 / Math.tan(fov / 2);
