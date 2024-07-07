@@ -1,4 +1,10 @@
-class MutableShape {
+interface MutableShape {
+  translate(translation: Vec3): MutableShape
+  moveTo(position: Vec3): MutableShape
+  rotate(axis: Vec3, theta: number): MutableShape
+}
+
+class MutableShape extends MutableObject {
   mesh: Mesh
 
   position: Vec3 = new Vec3()
@@ -6,6 +12,7 @@ class MutableShape {
   orientation: Matrix = Matrix.MakeIdentity()
 
   constructor(points: Vec3[], triangles: [number, number, number][]) {
+    super()
     this.mesh = new Mesh(points)
       .generateTriangles(triangles)
       .generateNormals()
@@ -13,21 +20,6 @@ class MutableShape {
 
   centerPoints(): MutableShape {
     this.mesh.centerPoints()
-    return this
-  }
-
-  translate(translation: Vec3): MutableShape {
-    Vec3.Add(this.position, translation)
-    return this
-  }
-
-  moveTo(position: Vec3): MutableShape {
-    Vec3.CopyFrom(this.position, position)
-    return this
-  }
-
-  rotate(axis: Vec3, theta: number): MutableShape {
-    Matrix.Dot(this.orientation, createRotMatQuaternion(axis, theta))
     return this
   }
 
