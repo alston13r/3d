@@ -34,4 +34,14 @@ class Color {
 
     return new Color(r, g, b)
   }
+
+  toString(): string {
+    const rByte: string = this.r.toString(16)
+    const gByte: string = this.g.toString(16)
+    const bByte: string = this.b.toString(16)
+    const rString: string = rByte.length == 1 ? '0' + rByte : rByte
+    const gString: string = gByte.length == 1 ? '0' + gByte : gByte
+    const bString: string = bByte.length == 1 ? '0' + bByte : bByte
+    return '#' + rString + gString + bString
+  }
 }
