@@ -13,7 +13,7 @@ class MutableObject {
   }
 
   rotate(axis: Vec3, theta: number): MutableObject {
-    Matrix.Dot(this.orientation, createRotMatQuaternion(axis, theta))
+    this.orientation = Matrix.Dot(this.orientation, createRotMatQuaternion(axis, theta))
     return this
   }
 
