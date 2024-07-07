@@ -22,17 +22,22 @@ const keybinds = {
     'Up': 'e',
     'Down': 'q',
     'Yaw left': 'ArrowLeft',
-    'Yaw right': 'ArrowRight'
+    'Yaw right': 'ArrowRight',
+    'Pitch up': 'ArrowDown',
+    'Pitch down': 'ArrowUp'
 };
 function loadInputs() {
     const FB = (keys[keybinds['Forward']] ? 1 : 0) - (keys[keybinds['Backward']] ? 1 : 0);
     const LR = (keys[keybinds['Right']] ? 1 : 0) - (keys[keybinds['Left']] ? 1 : 0);
     const UD = (keys[keybinds['Up']] ? 1 : 0) - (keys[keybinds['Down']] ? 1 : 0);
     const Y = (keys[keybinds['Yaw left']] ? 1 : 0) - (keys[keybinds['Yaw right']] ? 1 : 0);
+    const P = (keys[keybinds['Pitch up']] ? 1 : 0) - (keys[keybinds['Pitch down']] ? 1 : 0);
+    const right = cameraUp.cross(cameraDir).normal();
     Vec3.Add(cameraPos, cameraDir.normal().scale(FB * 0.02));
-    Vec3.Add(cameraPos, cameraUp.cross(cameraDir).normal().scale(LR * 0.02));
+    Vec3.Add(cameraPos, right.scale(LR * 0.02));
     Vec3.Add(cameraPos, cameraUp.normal().scale(UD * 0.02));
     Vec3.RotateAround(cameraDir, cameraUp, Y * 0.01);
+    Vec3.RotateAround(cameraDir, right, P * 0.01);
 }
 function logTriangle(tri, t) {
     if (t)
@@ -110,7 +115,6 @@ function drawLoop(timestamp = 0) {
     loadInputs();
     graphics.bg();
     const rotationMatrix = createRotMatQuaternion(new Vec3(1, 0, 0), theta);
-    // const rotationMatrix: Matrix = Matrix.MakeIdentity()
     const translationMatrix = createTranslationMat(new Vec3(0, 0, 3));
     const worldMatrix = Matrix.MakeIdentity()
         .dot(rotationMatrix)

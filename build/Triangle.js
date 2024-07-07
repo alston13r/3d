@@ -36,7 +36,7 @@ class Triangle {
         return new Triangle(this.p1.project(matrix), this.p2.project(matrix), this.p3.project(matrix));
     }
     draw(graphics) {
-        graphics.triangleFromVec3(this.p1, this.p2, this.p3);
+        graphics.triangleFromInstance(this);
     }
 }
 //# sourceMappingURL=Triangle.js.map

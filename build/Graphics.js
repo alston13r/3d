@@ -85,11 +85,8 @@ class Graphics {
             .stroke()
             .fill();
     }
-    triangleFromVec3(p1, p2, p3) {
-        this.triangle(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);
-    }
     triangleFromInstance(triangle) {
-        this.triangleFromVec3(...triangle.tuple());
+        this.triangle(triangle.p1.x, triangle.p1.y, triangle.p2.x, triangle.p2.y, triangle.p3.x, triangle.p3.y);
     }
     triangleToScreenSpace(triangle) {
         const width = this.width;
