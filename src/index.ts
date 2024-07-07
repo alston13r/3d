@@ -1,15 +1,10 @@
-const nearPlane: number = 0.1
-const farPlane: number = 1000
+const scene: Scene = new Scene()
 
-const camera: Camera = new Camera()
+const camera: Camera = scene.camera
 
 const cube: Cube = new Cube()
   .translate(new Vec3(2, 0, 3))
   .centerPoints()
-
-const graphics: Graphics = new Graphics().appendTo(document.body)
-
-const projectionMatrix: Matrix = graphics.createProjectionMatrix(90, farPlane, nearPlane)
 
 const keys: Record<string, boolean> = {}
 
@@ -57,56 +52,6 @@ function getLightColor(dp: number): string {
   return new Color(x, x, x).toString()
 }
 
-function clipVecAgainstPlane(planePoint: Vec3, planeNormal: Vec3, lineStart: Vec3, lineEnd: Vec3): Vec3 {
-  Vec3.Normal(planeNormal)
-  const planeD: number = -planeNormal.dot(planePoint)
-  const ad: number = lineStart.dot(planeNormal)
-  const bd: number = lineEnd.dot(planeNormal)
-  const t: number = (-planeD - ad) / (bd - ad)
-  const lineStartToEnd: Vec3 = lineEnd.sub(lineStart)
-  const lineToIntersect: Vec3 = lineStartToEnd.scale(t)
-  return lineStart.add(lineToIntersect)
-}
-
-function clipTriangleAgainstPlane(planePoint: Vec3, planeNormal: Vec3, triangle: Triangle): Triangle[] {
-  Vec3.Normal(planeNormal)
-
-  const dist = (p: Vec3) => planeNormal.dot(p) - planeNormal.dot(planePoint)
-
-  const insidePoints: Vec3[] = []
-  const outsidePoints: Vec3[] = []
-
-  const d0: number = dist(triangle.p1)
-  const d1: number = dist(triangle.p2)
-  const d2: number = dist(triangle.p3)
-
-  if (d0 >= 0) insidePoints[insidePoints.length] = triangle.p1
-  else outsidePoints[outsidePoints.length] = triangle.p1
-  if (d1 >= 0) insidePoints[insidePoints.length] = triangle.p2
-  else outsidePoints[outsidePoints.length] = triangle.p2
-  if (d2 >= 0) insidePoints[insidePoints.length] = triangle.p3
-  else outsidePoints[outsidePoints.length] = triangle.p3
-
-  if (insidePoints.length == 0) return []
-
-  else if (insidePoints.length == 3) return [triangle]
-
-  else if (insidePoints.length == 1) {
-    const p1: Vec3 = insidePoints[0]
-    const p2: Vec3 = clipVecAgainstPlane(planePoint, planeNormal, insidePoints[0], outsidePoints[0])
-    const p3: Vec3 = clipVecAgainstPlane(planePoint, planeNormal, insidePoints[0], outsidePoints[1])
-    return [new Triangle(p1, p2, p3)]
-  }
-
-  else {
-    const p1: Vec3 = insidePoints[0]
-    const p2: Vec3 = insidePoints[1]
-    const p3: Vec3 = clipVecAgainstPlane(planePoint, planeNormal, insidePoints[0], outsidePoints[0])
-    const p4: Vec3 = clipVecAgainstPlane(planePoint, planeNormal, insidePoints[1], outsidePoints[0])
-    return [new Triangle(p1, p2, p3), new Triangle(p2, p3, p4)]
-  }
-}
-
 let lastTimestamp: number = 0
 function drawLoop(timestamp: number = 0): void {
   const deltaTime: number = timestamp - lastTimestamp
@@ -117,7 +62,7 @@ function drawLoop(timestamp: number = 0): void {
 
   loadInputs()
 
-  graphics.bg()
+  scene.graphics.bg()
 
   const rotationMatrix: Matrix = createRotMatQuaternion(new Vec3(1, 0, 0), theta)
 
@@ -150,28 +95,14 @@ function drawLoop(timestamp: number = 0): void {
       const viewedTriangle: Triangle = transformedTriangle.applyMatrix(viewMatrix)
 
       // clip against near and far planes
-      const clippedTriangles: Triangle[] = []
-      clippedTriangles.push(...clipTriangleAgainstPlane(
-        new Vec3(0, 0, nearPlane),
-        new Vec3(0, 0, 1),
-        viewedTriangle
-      ))
-      const clippedN: number = clippedTriangles.length
-      for (let i = 0; i < clippedN; i++) {
-        const clipped: Triangle = clippedTriangles.shift() as Triangle
-        clippedTriangles.push(...clipTriangleAgainstPlane(
-          new Vec3(0, 0, farPlane),
-          new Vec3(0, 0, -1),
-          clipped
-        ))
-      }
+      const triangles: Triangle[] = scene.clipTriangleAgainstNearFarPlanes(viewedTriangle)
 
-      for (const clipped of clippedTriangles) {
+      for (const clipped of triangles) {
         // project
-        const projected: Triangle = clipped.project(projectionMatrix)
+        const projected: Triangle = clipped.project(scene.projectionMatrix)
 
         // scale
-        const scaled: Triangle = graphics.triangleToScreenSpace(projected)
+        const scaled: Triangle = scene.graphics.triangleToScreenSpace(projected)
 
         raster.push({ triangle: scaled, color })
       }
@@ -182,36 +113,13 @@ function drawLoop(timestamp: number = 0): void {
 
   for (const obj of raster) {
     const toClip: Triangle = obj.triangle
-    graphics.fillStyle = obj.color
-    graphics.strokeStyle = obj.color
+    scene.graphics.fillStyle = obj.color
+    scene.graphics.strokeStyle = obj.color
 
-    const arr: Triangle[] = [toClip]
+    const triangles: Triangle[] = scene.clipTriangleAgainstBorderPlanes(toClip)
 
-    for (let i = 0; i < 4; i++) {
-      const toClipN: number = arr.length
-
-      for (let j = 0; j < toClipN; j++) {
-        const clipping: Triangle = arr.shift() as Triangle
-
-        switch (i) {
-          case 0:
-            arr.push(...clipTriangleAgainstPlane(new Vec3(0, 0, 0), new Vec3(1, 0, 0), clipping))
-            break
-          case 1:
-            arr.push(...clipTriangleAgainstPlane(new Vec3(0, 0, 0), new Vec3(0, 1, 0), clipping))
-            break
-          case 2:
-            arr.push(...clipTriangleAgainstPlane(new Vec3(graphics.width, 0, 0), new Vec3(-1, 0, 0), clipping))
-            break
-          case 3:
-            arr.push(...clipTriangleAgainstPlane(new Vec3(0, graphics.height, 0), new Vec3(0, -1, 0), clipping))
-            break
-        }
-      }
-    }
-
-    for (const clipped of arr) {
-      graphics.triangleFromInstance(clipped)
+    for (const clipped of triangles) {
+      scene.graphics.triangleFromInstance(clipped)
     }
   }
 
