@@ -131,14 +131,18 @@ class Graphics {
     this.context.fillRect(x, y, w, h)
   }
 
-  triangle(x1: number, y1: number, x2: number, y2: number, x3: number, y3: number): void {
+  triangle(
+    x1: number, y1: number, x2: number, y2: number, x3: number, y3: number,
+    stroke: boolean = true, fill: boolean = true
+  ): void {
+    if (!stroke && !fill) return
     this.beginPath()
       .moveTo(x1, y1)
       .lineTo(x2, y2)
       .lineTo(x3, y3)
       .closePath()
-      .stroke()
-      .fill()
+    if (stroke) this.stroke()
+    if (fill) this.fill()
   }
 
   triangleFromInstance(triangle: Triangle): void {
@@ -168,7 +172,7 @@ class Graphics {
     )
   }
 
-  createProjectionMatrix(fov: number = 90, zFar: number = 1000, zNear: number = 0.1): Matrix {
+  createProjectionMatrix(fov: number = 90, zNear: number = 0.1, zFar: number = 1000): Matrix {
     const asp: number = this.aspHW
     fov = lerp(fov, 0, 360, 0, 2 * Math.PI)
     const f: number = 1 / Math.tan(fov / 2)
