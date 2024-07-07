@@ -39,16 +39,6 @@ function loadInputs() {
     camera.rotate(up, Y * 0.01);
     camera.rotate(camera.getRight(), P * 0.01);
 }
-function logTriangle(tri, t) {
-    if (t)
-        console.log(t);
-    console.log('p1: [' + [...tri.p1].join(', ') + ']');
-    console.log('p2: [' + [...tri.p2].join(', ') + ']');
-    console.log('p3: [' + [...tri.p3].join(', ') + ']');
-}
-graphics.context.font = 'arial 10px';
-graphics.context.textAlign = 'left';
-graphics.context.textBaseline = 'top';
 function getLightColor(dp) {
     const x = clamp(Math.round(dp * 255), 30, 250);
     return new Color(x, x, x).toString();
@@ -125,7 +115,7 @@ function drawLoop(timestamp = 0) {
         const normal = transformedTriangle.getNormal();
         if (normal.dot(cameraRay) < 0) { // triangle face is visible
             const dp = lightDir.dot(normal);
-            const color = getLightColor(dp);
+            const color = Color.FromGrey(clamp(Math.round(dp * 255), 30, 250)).toString();
             // view
             const viewedTriangle = transformedTriangle.applyMatrix(viewMatrix);
             // clip against near and far planes

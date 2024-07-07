@@ -13,6 +13,9 @@ class Color {
         this.g = g;
         this.b = b;
     }
+    static FromGrey(x = 0) {
+        return new Color(x, x, x);
+    }
     static FromString(str) {
         if (str.indexOf('#') == 0)
             str = str.substring(1);
