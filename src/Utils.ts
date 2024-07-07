@@ -84,7 +84,7 @@ function createRotMatQuaternion(axis: Vec3, theta: number) {
 
 function createLookAtMatrix(pos: Vec3, target: Vec3, up: Vec3): Matrix {
   const newFront: Vec3 = target.sub(pos).normal()
-  const a: Vec3 = newFront.scale(up.dot(newFront))
+  const a: Vec3 = newFront.scale(up.normal().dot(newFront))
   const newUp: Vec3 = up.sub(a).normal()
   const newRight: Vec3 = newUp.cross(newFront)
 
