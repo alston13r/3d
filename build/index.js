@@ -1,6 +1,7 @@
 "use strict";
 const nearPlane = 0.1;
 const farPlane = 1000;
+const camera = new Camera();
 const cube = new Cube()
     .translate(new Vec3(2, 0, 3))
     .centerPoints();
@@ -10,9 +11,6 @@ const keys = {};
 window.addEventListener('keydown', e => keys[e.key] = true);
 window.addEventListener('keyup', e => keys[e.key] = false);
 let theta = 0;
-const cameraPos = new Vec3();
-const cameraDir = new Vec3(0, 0, 1);
-const cameraUp = new Vec3(0, 1, 0);
 const lightDir = new Vec3(0.2, 0, -1).normal();
 const keybinds = {
     'Forward': 'w',
@@ -32,13 +30,14 @@ function loadInputs() {
     const UD = (keys[keybinds['Up']] ? 1 : 0) - (keys[keybinds['Down']] ? 1 : 0);
     const Y = (keys[keybinds['Yaw left']] ? 1 : 0) - (keys[keybinds['Yaw right']] ? 1 : 0);
     const P = (keys[keybinds['Pitch up']] ? 1 : 0) - (keys[keybinds['Pitch down']] ? 1 : 0);
-    const right = cameraUp.cross(cameraDir).normal();
-    Vec3.Add(cameraPos, cameraDir.normal().scale(FB * 0.02));
-    Vec3.Add(cameraPos, right.scale(LR * 0.02));
-    Vec3.Add(cameraPos, cameraUp.normal().scale(UD * 0.02));
-    Vec3.RotateAround(cameraDir, cameraUp, Y * 0.01);
-    Vec3.RotateAround(cameraDir, right, P * 0.01);
-    Vec3.RotateAround(cameraUp, right, P * 0.01);
+    const right = camera.getRight();
+    const up = camera.getUp();
+    const front = camera.getFront();
+    camera.translate(front.normal().scale(FB * 0.02));
+    camera.translate(right.normal().scale(LR * 0.02));
+    camera.translate(up.normal().scale(UD * 0.02));
+    camera.rotate(up, Y * 0.01);
+    camera.rotate(camera.getRight(), P * 0.01);
 }
 function logTriangle(tri, t) {
     if (t)
@@ -115,13 +114,13 @@ function drawLoop(timestamp = 0) {
     const worldMatrix = Matrix.MakeIdentity()
         .dot(rotationMatrix)
         .dot(translationMatrix);
-    const viewMatrix = invertLookAtMatrix(createLookAtMatrix(cameraPos, cameraPos.add(cameraDir), cameraUp));
+    const viewMatrix = invertLookAtMatrix(camera.createLookAtMatrix());
     const raster = [];
     for (const tri of cube.mesh.triangles) {
         const triangle = new Triangle(tri.getP1(), tri.getP2(), tri.getP3());
         const transformedTriangle = triangle.applyMatrix(worldMatrix);
-        const cameraRay = transformedTriangle.p1.sub(cameraPos);
-        if (cameraRay.dot(cameraDir) < 0)
+        const cameraRay = transformedTriangle.p1.sub(camera.position);
+        if (cameraRay.dot(camera.getFront()) < 0)
             continue; // triangle is behind camera
         const normal = transformedTriangle.getNormal();
         if (normal.dot(cameraRay) < 0) { // triangle face is visible

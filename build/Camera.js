@@ -1,6 +1,6 @@
 "use strict";
 class Camera extends MutableObject {
-    lookAt(target, roll) {
+    pointTo(target, roll) {
         this.orientation = Matrix.MakeIdentity();
         const diff = target.sub(this.position);
         const yaw = Math.atan2(diff.z, diff.x);
@@ -10,6 +10,9 @@ class Camera extends MutableObject {
         if (roll)
             this.rotate(this.getFront(), roll);
         return this;
+    }
+    createLookAtMatrix() {
+        return createLookAtMatrix(this.position, this.position.add(this.getFront()), this.getUp());
     }
 }
 //# sourceMappingURL=Camera.js.map

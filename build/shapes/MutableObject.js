@@ -11,7 +11,7 @@ class MutableObject {
         return this;
     }
     rotate(axis, theta) {
-        Matrix.Dot(this.orientation, createRotMatQuaternion(axis, theta));
+        this.orientation = Matrix.Dot(this.orientation, createRotMatQuaternion(axis, theta));
         return this;
     }
     getRight() {
