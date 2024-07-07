@@ -68,9 +68,8 @@ function text(t: string, x: number, y: number): void {
 }
 
 function getLightColor(dp: number): string {
-  const s: string = clamp(Math.round(dp * 255), 30, 250).toString(16)
-  const sMod: string = s.length == 1 ? '0' + s : s
-  return '#' + sMod + sMod + sMod
+  const x: number = clamp(Math.round(dp * 255), 30, 250)
+  return new Color(x, x, x).toString()
 }
 
 function clipVecAgainstPlane(planePoint: Vec3, planeNormal: Vec3, lineStart: Vec3, lineEnd: Vec3): Vec3 {
@@ -132,6 +131,8 @@ function drawLoop(timestamp: number = 0): void {
   theta %= 2 * Math.PI
 
   loadInputs()
+
+  graphics.createFrame()
 
   graphics.bg()
 
@@ -239,6 +240,8 @@ function drawLoop(timestamp: number = 0): void {
       graphics.triangleFromInstance(clipped)
     }
   }
+
+  graphics.disposeFrame()
 
   window.requestAnimationFrame(drawLoop)
 }
