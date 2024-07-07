@@ -116,9 +116,7 @@ function drawLoop(timestamp = 0) {
         .dot(rotationMatrix)
         .dot(translationMatrix);
     const viewMatrix = invertLookAtMatrix(createLookAtMatrix(cameraPos, cameraPos.add(cameraDir), cameraUp));
-    graphics.strokeStyle = '#fff';
     const raster = [];
-    let i = 0;
     for (const tri of cube.mesh.triangles) {
         const triangle = new Triangle(tri.getP1(), tri.getP2(), tri.getP3());
         const transformedTriangle = triangle.applyMatrix(worldMatrix);
