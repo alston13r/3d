@@ -1,6 +1,8 @@
 const nearPlane: number = 0.1
 const farPlane: number = 1000
 
+const camera: Camera = new Camera()
+
 const cube: Cube = new Cube()
   .translate(new Vec3(2, 0, 3))
   .centerPoints()
@@ -15,10 +17,6 @@ window.addEventListener('keydown', e => keys[e.key] = true)
 window.addEventListener('keyup', e => keys[e.key] = false)
 
 let theta: number = 0
-
-const cameraPos: Vec3 = new Vec3()
-const cameraDir: Vec3 = new Vec3(0, 0, 1)
-const cameraUp: Vec3 = new Vec3(0, 1, 0)
 
 const lightDir: Vec3 = new Vec3(0.2, 0, -1).normal()
 
@@ -42,14 +40,16 @@ function loadInputs(): void {
   const Y: number = (keys[keybinds['Yaw left']] ? 1 : 0) - (keys[keybinds['Yaw right']] ? 1 : 0)
   const P: number = (keys[keybinds['Pitch up']] ? 1 : 0) - (keys[keybinds['Pitch down']] ? 1 : 0)
 
-  const right: Vec3 = cameraUp.cross(cameraDir).normal()
+  const right: Vec3 = camera.getRight()
+  const up: Vec3 = camera.getUp()
+  const front: Vec3 = camera.getFront()
 
-  Vec3.Add(cameraPos, cameraDir.normal().scale(FB * 0.02))
-  Vec3.Add(cameraPos, right.scale(LR * 0.02))
-  Vec3.Add(cameraPos, cameraUp.normal().scale(UD * 0.02))
-  Vec3.RotateAround(cameraDir, cameraUp, Y * 0.01)
-  Vec3.RotateAround(cameraDir, right, P * 0.01)
-  Vec3.RotateAround(cameraUp, right, P * 0.01)
+  camera.translate(front.normal().scale(FB * 0.02))
+  camera.translate(right.normal().scale(LR * 0.02))
+  camera.translate(up.normal().scale(UD * 0.02))
+
+  camera.rotate(up, Y * 0.01)
+  camera.rotate(camera.getRight(), P * 0.01)
 }
 
 function logTriangle(tri: Triangle, t?: string): void {
@@ -130,10 +130,6 @@ function drawLoop(timestamp: number = 0): void {
 
   graphics.bg()
 
-
-
-
-
   const rotationMatrix: Matrix = createRotMatQuaternion(new Vec3(1, 0, 0), theta)
 
   const translationMatrix: Matrix = createTranslationMat(new Vec3(0, 0, 3))
@@ -142,7 +138,7 @@ function drawLoop(timestamp: number = 0): void {
     .dot(rotationMatrix)
     .dot(translationMatrix)
 
-  const viewMatrix: Matrix = invertLookAtMatrix(createLookAtMatrix(cameraPos, cameraPos.add(cameraDir), cameraUp))
+  const viewMatrix: Matrix = invertLookAtMatrix(camera.createLookAtMatrix())
 
   const raster: { triangle: Triangle, color: string }[] = []
 
@@ -151,9 +147,9 @@ function drawLoop(timestamp: number = 0): void {
 
     const transformedTriangle: Triangle = triangle.applyMatrix(worldMatrix)
 
-    const cameraRay: Vec3 = transformedTriangle.p1.sub(cameraPos)
+    const cameraRay: Vec3 = transformedTriangle.p1.sub(camera.position)
 
-    if (cameraRay.dot(cameraDir) < 0) continue // triangle is behind camera
+    if (cameraRay.dot(camera.getFront()) < 0) continue // triangle is behind camera
 
     const normal: Vec3 = transformedTriangle.getNormal()
 
