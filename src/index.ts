@@ -52,17 +52,6 @@ function loadInputs(): void {
   camera.rotate(camera.getRight(), P * 0.01)
 }
 
-function logTriangle(tri: Triangle, t?: string): void {
-  if (t) console.log(t)
-  console.log('p1: [' + [...tri.p1].join(', ') + ']')
-  console.log('p2: [' + [...tri.p2].join(', ') + ']')
-  console.log('p3: [' + [...tri.p3].join(', ') + ']')
-}
-
-graphics.context.font = 'arial 10px'
-graphics.context.textAlign = 'left'
-graphics.context.textBaseline = 'top'
-
 function getLightColor(dp: number): string {
   const x: number = clamp(Math.round(dp * 255), 30, 250)
   return new Color(x, x, x).toString()
@@ -155,7 +144,7 @@ function drawLoop(timestamp: number = 0): void {
 
     if (normal.dot(cameraRay) < 0) { // triangle face is visible
       const dp: number = lightDir.dot(normal)
-      const color: string = getLightColor(dp)
+      const color: string = Color.FromGrey(clamp(Math.round(dp * 255), 30, 250)).toString()
 
       // view
       const viewedTriangle: Triangle = transformedTriangle.applyMatrix(viewMatrix)
