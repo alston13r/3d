@@ -3,8 +3,7 @@ class MutableShape {
 
   position: Vec3 = new Vec3()
   scale: Vec3 = new Vec3(1, 1, 1)
-  orientation: Orientation = new Orientation(new Vec3(0, 0, 1), new Vec3(0, 1, 0))
-  rotation: Matrix = Matrix.MakeIdentity()
+  orientation: Matrix = Matrix.MakeIdentity()
 
   constructor(points: Vec3[], triangles: [number, number, number][]) {
     this.mesh = new Mesh(points)
@@ -28,7 +27,7 @@ class MutableShape {
   }
 
   rotate(axis: Vec3, theta: number): MutableShape {
-    this.rotation = this.orientation.rotate(axis, theta)
+    Matrix.Dot(this.orientation, createRotMatQuaternion(axis, theta))
     return this
   }
 
@@ -49,7 +48,7 @@ class MutableShape {
         [0, 0, 0, 1]
       ]),
       translation: createTranslationMat(this.position),
-      rotation: this.rotation
+      rotation: this.orientation
     })
   }
 }
