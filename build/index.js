@@ -54,9 +54,8 @@ function text(t, x, y) {
     graphics.context.fillText(t, x, y);
 }
 function getLightColor(dp) {
-    const s = clamp(Math.round(dp * 255), 30, 250).toString(16);
-    const sMod = s.length == 1 ? '0' + s : s;
-    return '#' + sMod + sMod + sMod;
+    const x = clamp(Math.round(dp * 255), 30, 250);
+    return new Color(x, x, x).toString();
 }
 function clipVecAgainstPlane(planePoint, planeNormal, lineStart, lineEnd) {
     Vec3.Normal(planeNormal);
@@ -113,6 +112,7 @@ function drawLoop(timestamp = 0) {
     theta += deltaTime / 1000;
     theta %= 2 * Math.PI;
     loadInputs();
+    graphics.createFrame();
     graphics.bg();
     const rotationMatrix = createRotMatQuaternion(new Vec3(1, 0, 0), theta);
     const translationMatrix = createTranslationMat(new Vec3(0, 0, 3));
@@ -179,6 +179,7 @@ function drawLoop(timestamp = 0) {
             graphics.triangleFromInstance(clipped);
         }
     }
+    graphics.disposeFrame();
     window.requestAnimationFrame(drawLoop);
 }
 window.requestAnimationFrame(drawLoop);

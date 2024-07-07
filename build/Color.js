@@ -31,5 +31,14 @@ class Color {
         }
         return new Color(r, g, b);
     }
+    toString() {
+        const rByte = this.r.toString(16);
+        const gByte = this.g.toString(16);
+        const bByte = this.b.toString(16);
+        const rString = rByte.length == 1 ? '0' + rByte : rByte;
+        const gString = gByte.length == 1 ? '0' + gByte : gByte;
+        const bString = bByte.length == 1 ? '0' + bByte : bByte;
+        return '#' + rString + gString + bString;
+    }
 }
 //# sourceMappingURL=Color.js.map

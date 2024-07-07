@@ -9,8 +9,8 @@ class Graphics {
         this.canvas.width = 800;
         this.canvas.height = 600;
         this.context = this.canvas.getContext('2d');
-        this.zBuffer = new Array(800).fill(0).map(() => new Array(600).fill(farPlane));
-        this.colorBuffer = new Array(800).fill(0).map(() => new Array(600).fill(Color.Black));
+        this.zBuffer = new Array(480000).fill(1);
+        this.colorBuffer = new Array(1440000).fill(0);
     }
     appendTo(element) {
         element.appendChild(this.canvas);
@@ -19,8 +19,8 @@ class Graphics {
     setSize(width, height) {
         this.canvas.width = width;
         this.canvas.height = height;
-        this.zBuffer = new Array(width).fill(0).map(() => new Array(height).fill(farPlane));
-        this.colorBuffer = new Array(width).fill(0).map(() => new Array(height).fill(Color.Black));
+        this.zBuffer = new Array(width * height).fill(1);
+        this.colorBuffer = new Array(width * height * 4).fill(0);
         return this;
     }
     get width() {
@@ -83,32 +83,26 @@ class Graphics {
         this.context.strokeStyle = c;
     }
     createFrame() {
-        const width = this.width;
-        const height = this.height;
-        for (let x = 0; x < width; x++) {
-            for (let y = 0; y < height; y++) {
-                this.zBuffer[x][y] = farPlane;
-                this.colorBuffer[x][y] = Color.Black;
-            }
-        }
+        this.zBuffer.fill(0);
+        this.colorBuffer.fill(0);
         return this;
     }
     disposeFrame() {
-        const width = this.width;
-        const height = this.height;
-        const data = new Uint8ClampedArray(width * height * 4);
-        for (let x = 0; x < width; x++) {
-            for (let y = 0; y < height; y++) {
-                const color = this.colorBuffer[x][y];
-                const i = (x + y * width) * 4;
-                data[i] = color.r;
-                data[i + 1] = color.g;
-                data[i + 2] = color.b;
-                data[i + 3] = 255;
-            }
+        const imageData = this.context.getImageData(0, 0, this.width, this.height);
+        const data = imageData.data;
+        this.colorBuffer.forEach((x, i) => {
+            if (i != 0 && (i + 1) % 4 == 0)
+                return;
+            data[i] = x;
+        });
+        for (let i = 3; i < data.length; i += 4) {
+            data[i] = 255;
         }
-        this.context.putImageData(new ImageData(data, width), 0, 0);
+        // this.context.putImageData(new ImageData(data, width), 0, 0)
         return this;
+    }
+    text(text, x, y) {
+        this.context.fillText(text, x, y);
     }
     triangle(x1, y1, x2, y2, x3, y3) {
         this.beginPath()
