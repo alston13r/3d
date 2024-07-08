@@ -38,4 +38,33 @@ class MeshTriangle {
     return new Triangle(this.getP1(), this.getP2(), this.getP3())
       .project(matrix)
   }
+
+  static Subdivide(triangle: MeshTriangle): MeshTriangle[] {
+    const mesh: Mesh = triangle.mesh
+
+    // remove original from mesh
+    mesh.triangles.splice(mesh.triangles.indexOf(triangle), 1)
+
+    // create three new points
+    const pointA: Vec3 = triangle.getP1().midpoint(triangle.getP2())
+    const pointB: Vec3 = triangle.getP2().midpoint(triangle.getP3())
+    const pointC: Vec3 = triangle.getP3().midpoint(triangle.getP1())
+
+    const pointCIndex: number = mesh.points.push(pointA, pointB, pointC) - 1
+    const pointBIndex: number = pointCIndex - 1
+    const pointAIndex: number = pointBIndex - 1
+
+    // create four new triangles
+    let triangleIndex: number = mesh.triangles.length
+    const triangleA: MeshTriangle = new MeshTriangle(mesh, triangleIndex++, triangle.p1, pointAIndex, pointCIndex)
+    const triangleB: MeshTriangle = new MeshTriangle(mesh, triangleIndex++, triangle.p2, pointBIndex, pointAIndex)
+    const triangleC: MeshTriangle = new MeshTriangle(mesh, triangleIndex++, triangle.p3, pointCIndex, pointBIndex)
+    const triangleD: MeshTriangle = new MeshTriangle(mesh, triangleIndex++, pointAIndex, pointBIndex, pointCIndex)
+
+    const newTriangles: MeshTriangle[] = [triangleA, triangleB, triangleC, triangleD]
+
+    mesh.triangles.push(...newTriangles)
+    mesh.generateNormals()
+    return newTriangles
+  }
 }
