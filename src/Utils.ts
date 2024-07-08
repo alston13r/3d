@@ -1,3 +1,5 @@
+const GoldenRatio: number = (1 + Math.sqrt(5)) / 2
+
 function lerp(x: number, a: number, b: number, c: number, d: number): number {
   return (x - a) / (b - a) * (d - c) + c
 }
