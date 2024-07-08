@@ -136,4 +136,12 @@ class Vec3 {
   rotateAround(axis: Vec3, theta: number): Vec3 {
     return Vec3.RotateAround(this.copy(), axis, theta)
   }
+
+  static Midpoint(a: Vec3, b: Vec3): Vec3 {
+    return a.add(b).scale(0.5)
+  }
+
+  midpoint(v: Vec3): Vec3 {
+    return Vec3.Midpoint(this, v)
+  }
 }
