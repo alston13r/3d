@@ -1,4 +1,5 @@
 "use strict";
+const GoldenRatio = (1 + Math.sqrt(5)) / 2;
 function lerp(x, a, b, c, d) {
     return (x - a) / (b - a) * (d - c) + c;
 }

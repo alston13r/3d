@@ -107,5 +107,11 @@ class Vec3 {
     rotateAround(axis, theta) {
         return Vec3.RotateAround(this.copy(), axis, theta);
     }
+    static Midpoint(a, b) {
+        return a.add(b).scale(0.5);
+    }
+    midpoint(v) {
+        return Vec3.Midpoint(this, v);
+    }
 }
 //# sourceMappingURL=Vec3.js.map
