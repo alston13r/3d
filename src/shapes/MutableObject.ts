@@ -28,4 +28,8 @@ class MutableObject {
   getFront(): Vec3 {
     return new Vec3(...this.orientation.mat[2])
   }
+
+  getWorldMatrix(): Matrix {
+    return this.orientation.dot(createTranslationMat(this.position))
+  }
 }

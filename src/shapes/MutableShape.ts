@@ -7,9 +7,7 @@ interface MutableShape {
 class MutableShape extends MutableObject {
   mesh: Mesh
 
-  position: Vec3 = new Vec3()
-  scale: Vec3 = new Vec3(1, 1, 1)
-  orientation: Matrix = Matrix.MakeIdentity()
+  scale: Matrix = Matrix.MakeIdentity()
 
   constructor(points: Vec3[], triangles: [number, number, number][]) {
     super()
@@ -24,23 +22,13 @@ class MutableShape extends MutableObject {
   }
 
   stretch(x: number = 1, y: number = 1, z: number = 1): MutableShape {
-    this.scale.x *= x
-    this.scale.y *= y
-    this.scale.z *= z
+    this.scale.mat[0][0] *= x
+    this.scale.mat[1][1] *= y
+    this.scale.mat[2][2] *= z
     return this
   }
 
-  applyMatrices(matrices?: MutationMatrices): Mesh {
-    return this.mesh.applyMatrices({
-      camera: matrices?.camera,
-      scale: Matrix.FromArr([
-        [this.scale.x, 0, 0, 0],
-        [0, this.scale.y, 0, 0],
-        [0, 0, this.scale.z, 0],
-        [0, 0, 0, 1]
-      ]),
-      translation: createTranslationMat(this.position),
-      rotation: this.orientation
-    })
+  getWorldMatrix(): Matrix {
+    return this.scale.dot(super.getWorldMatrix())
   }
 }
