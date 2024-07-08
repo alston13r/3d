@@ -23,5 +23,8 @@ class MutableObject {
     getFront() {
         return new Vec3(...this.orientation.mat[2]);
     }
+    getWorldMatrix() {
+        return this.orientation.dot(createTranslationMat(this.position));
+    }
 }
 //# sourceMappingURL=MutableObject.js.map

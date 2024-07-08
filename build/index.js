@@ -4,11 +4,13 @@ const camera = scene.camera;
 const cube = new Cube()
     .translate(new Vec3(2, 0, 3))
     .centerPoints();
+const sphere = new UVSphere(0.5, 10, 10)
+    .translate(new Vec3(-2, 0, 3));
+const objects = [cube, sphere];
 const keys = {};
 window.addEventListener('keydown', e => keys[e.key] = true);
 window.addEventListener('keyup', e => keys[e.key] = false);
-let theta = 0;
-const lightDir = new Vec3(0.2, 0, -1).normal();
+const lightDir = new Vec3(-0.1, -0.1, 1).normal().scale(-1);
 const keybinds = {
     'Forward': 'w',
     'Backward': 's',
@@ -44,20 +46,40 @@ let lastTimestamp = 0;
 function drawLoop(timestamp = 0) {
     const deltaTime = timestamp - lastTimestamp;
     lastTimestamp = timestamp;
-    theta += deltaTime / 1000;
-    theta %= 2 * Math.PI;
     loadInputs();
     scene.graphics.bg();
-    const rotationMatrix = createRotMatQuaternion(new Vec3(1, 0, 0), theta);
-    const translationMatrix = createTranslationMat(new Vec3(0, 0, 3));
-    const worldMatrix = Matrix.MakeIdentity()
-        .dot(rotationMatrix)
-        .dot(translationMatrix);
-    const viewMatrix = invertLookAtMatrix(camera.createLookAtMatrix());
+    cube.rotate(new Vec3(1, 0, 0), 0.008);
+    const cubeWorldMatrix = cube.getWorldMatrix();
+    const sphereWorldMatrix = sphere.getWorldMatrix();
+    const viewMatrix = camera.createViewMatrix();
     const raster = [];
+    // const trianglesToProject: MeshTriangle[] = cube.mesh.triangles.concat(sphere.mesh.triangles)
     for (const tri of cube.mesh.triangles) {
         const triangle = new Triangle(tri.getP1(), tri.getP2(), tri.getP3());
-        const transformedTriangle = triangle.applyMatrix(worldMatrix);
+        const transformedTriangle = triangle.applyMatrix(cubeWorldMatrix);
+        const cameraRay = transformedTriangle.p1.sub(camera.position);
+        if (cameraRay.dot(camera.getFront()) < 0)
+            continue; // triangle is behind camera
+        const normal = transformedTriangle.getNormal();
+        if (normal.dot(cameraRay) < 0) { // triangle face is visible
+            const dp = lightDir.dot(normal);
+            const color = Color.FromGrey(clamp(Math.round(dp * 255), 30, 250)).toString();
+            // view
+            const viewedTriangle = transformedTriangle.applyMatrix(viewMatrix);
+            // clip against near and far planes
+            const triangles = scene.clipTriangleAgainstNearFarPlanes(viewedTriangle);
+            for (const clipped of triangles) {
+                // project
+                const projected = clipped.project(scene.projectionMatrix);
+                // scale
+                const scaled = scene.graphics.triangleToScreenSpace(projected);
+                raster.push({ triangle: scaled, color });
+            }
+        }
+    }
+    for (const tri of sphere.mesh.triangles) {
+        const triangle = new Triangle(tri.getP1(), tri.getP2(), tri.getP3());
+        const transformedTriangle = triangle.applyMatrix(sphereWorldMatrix);
         const cameraRay = transformedTriangle.p1.sub(camera.position);
         if (cameraRay.dot(camera.getFront()) < 0)
             continue; // triangle is behind camera

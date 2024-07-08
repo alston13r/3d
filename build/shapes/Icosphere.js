@@ -1,53 +1,6 @@
 "use strict";
-class UVSphere extends MutableShape {
-    constructor(verticalDivisions = 4, horizontalDivisions = 4) {
-        // top point
-        // bottom point
-        // everything in between
-        // rotate around
-        super([], []);
-        // const points: Vec3[][] = []
-        // for (let i = 0; i < verticalDivisions; i++) {
-        //   points[i] = []
-        //   const tau: number = 2 *Math.PI * i
-        // }
-        // super(points, [])
-    }
+class IcoSphere extends MutableShape {
 }
-class Icosphere extends MutableShape {
-}
-// class UVSphere extends SpatialMeshable {
-//   constructor(pos: Vector = new Vector(), radius: number = 1, horizontalDivisions: number = 4, verticalDivisions: number = 4, orientation: OrientationMatrix = new OrientationMatrix()) {
-//     horizontalDivisions = horizontalDivisions > 4 ? horizontalDivisions : 4
-//     verticalDivisions = verticalDivisions > 4 ? verticalDivisions : 4
-//     let tris: Triangle[] = []
-//     let vertecies: Vector[][] = []
-//     for (let i=0; i<=verticalDivisions; i++) {
-//       vertecies[i] = []
-//       let tau: number = 2*Math.PI*i/verticalDivisions
-//       for (let j=0; j<=horizontalDivisions; j++) {
-//         let theta: number = Math.PI*j/horizontalDivisions
-//         let vec: Vector = new Vector(Math.sin(theta), Math.cos(theta), 0)
-//         vertecies[i].push(vec.rotateAround(Vector.jHat, tau))
-//       }
-//     }
-//     for (let slice of vertecies) {
-//       for (let v of slice) {
-//         Vector.Scale(Vector.Hat(v), radius)
-//       }
-//     }
-//     for (let i=0; i<vertecies.length-1; i++) {
-//       let currSector: Vector[] = vertecies[i]
-//       let nextSector: Vector[] = vertecies[i+1]
-//       tris.push(new Triangle(currSector[0], nextSector[1], currSector[1]))
-//       for (let j=1; j<currSector.length-1; j++) {
-//         tris.push(new Triangle(currSector[j], nextSector[j], currSector[j+1]))
-//         if (j != currSector.length-2) tris.push(new Triangle(currSector[j+1], nextSector[j], nextSector[j+1]))
-//       }
-//     }
-//     super(pos, orientation, new Mesh(tris.map((t: Triangle) => t.copy())))
-//   }
-// }
 // class Icosphere extends SpatialMeshable {
 //   constructor(pos: Vector = new Vector(), subdivisions: number = 0, radius: number = 1, orientation: OrientationMatrix = new OrientationMatrix()) {
 //     let t: number = (1+Math.sqrt(5))/2
@@ -110,16 +63,4 @@ class Icosphere extends MutableShape {
 //     super(pos, orientation, new Mesh(tris.map((t: Triangle) => t.copy())))
 //   }
 // }
-// class Sphere {
-//   static P1: Vec3 = new Vec3(0, 0, 0)
-//   static P2: Vec3 = new Vec3(0, 1, 0)
-//   static P3: Vec3 = new Vec3(1, 0, 0)
-//   static P4: Vec3 = new Vec3(1, 1, 0)
-//   static P5: Vec3 = new Vec3(1, 0, 1)
-//   static P6: Vec3 = new Vec3(1, 1, 1)
-//   static P7: Vec3 = new Vec3(0, 0, 1)
-//   static P8: Vec3 = new Vec3(0, 1, 1)
-//   constructor() {
-//   }
-// }
-//# sourceMappingURL=Sphere.js.map
+//# sourceMappingURL=Icosphere.js.map

@@ -14,5 +14,8 @@ class Camera extends MutableObject {
     createLookAtMatrix() {
         return createLookAtMatrix(this.position, this.position.add(this.getFront()), this.getUp());
     }
+    createViewMatrix() {
+        return invertLookAtMatrix(this.createLookAtMatrix());
+    }
 }
 //# sourceMappingURL=Camera.js.map

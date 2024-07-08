@@ -79,23 +79,6 @@ class Vec3 {
     cross(v) {
         return Vec3.Cross(this, v);
     }
-    applyMatrices(matrices) {
-        matrices.identity ||= Matrix.MakeIdentity();
-        matrices.scale ||= Matrix.MakeIdentity();
-        matrices.rotation ||= Matrix.MakeIdentity();
-        matrices.orbital ||= Matrix.MakeIdentity();
-        matrices.translation ||= Matrix.MakeIdentity();
-        matrices.camera ||= Matrix.MakeIdentity();
-        const vecMat = Matrix.FromArr([this.x, this.y, this.z, 1]);
-        const mutated = vecMat
-            .dot(matrices.identity)
-            .dot(matrices.scale)
-            .dot(matrices.rotation)
-            .dot(matrices.orbital)
-            .dot(matrices.translation)
-            .dot(matrices.camera);
-        return new Vec3(...mutated.toArray());
-    }
     project(matrix) {
         const mat = Matrix.FromArr([...this, 1]);
         const projectedMat = mat.dot(matrix);
@@ -120,6 +103,9 @@ class Vec3 {
         const p = new Quaternion(0, v);
         const pRot = q.mul(p).mul(qi);
         return Vec3.CopyFrom(v, pRot.imaginary);
+    }
+    rotateAround(axis, theta) {
+        return Vec3.RotateAround(this.copy(), axis, theta);
     }
 }
 //# sourceMappingURL=Vec3.js.map

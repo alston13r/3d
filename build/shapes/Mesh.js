@@ -38,9 +38,5 @@ class Mesh {
         }
         return this;
     }
-    applyMatrices(matrices) {
-        const mutatedVec3s = this.points.map(v => v.applyMatrices(matrices));
-        return this.copyTrianglesToMesh(new Mesh(mutatedVec3s)).generateNormals();
-    }
 }
 //# sourceMappingURL=Mesh.js.map
