@@ -45,9 +45,4 @@ class Mesh {
     }
     return this
   }
-
-  applyMatrices(matrices: MutationMatrices): Mesh {
-    const mutatedVec3s: Vec3[] = this.points.map(v => v.applyMatrices(matrices))
-    return this.copyTrianglesToMesh(new Mesh(mutatedVec3s)).generateNormals()
-  }
 }
