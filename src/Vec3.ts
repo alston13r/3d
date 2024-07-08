@@ -103,27 +103,6 @@ class Vec3 {
     return Vec3.Cross(this, v)
   }
 
-  applyMatrices(matrices: MutationMatrices): Vec3 {
-    matrices.identity ||= Matrix.MakeIdentity()
-    matrices.scale ||= Matrix.MakeIdentity()
-    matrices.rotation ||= Matrix.MakeIdentity()
-    matrices.orbital ||= Matrix.MakeIdentity()
-    matrices.translation ||= Matrix.MakeIdentity()
-    matrices.camera ||= Matrix.MakeIdentity()
-
-    const vecMat: Matrix = Matrix.FromArr([this.x, this.y, this.z, 1])
-
-    const mutated: Matrix = vecMat
-      .dot(matrices.identity)
-      .dot(matrices.scale)
-      .dot(matrices.rotation)
-      .dot(matrices.orbital)
-      .dot(matrices.translation)
-      .dot(matrices.camera)
-
-    return new Vec3(...mutated.toArray())
-  }
-
   project(matrix: Matrix): Vec3 {
     const mat: Matrix = Matrix.FromArr([...this, 1])
     const projectedMat: Matrix = mat.dot(matrix)
@@ -152,5 +131,9 @@ class Vec3 {
     const p: Quaternion = new Quaternion(0, v)
     const pRot: Quaternion = q.mul(p).mul(qi)
     return Vec3.CopyFrom(v, pRot.imaginary)
+  }
+
+  rotateAround(axis: Vec3, theta: number): Vec3 {
+    return Vec3.RotateAround(this.copy(), axis, theta)
   }
 }
