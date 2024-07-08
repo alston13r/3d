@@ -23,4 +23,8 @@ class Camera extends MutableObject {
   createLookAtMatrix(): Matrix {
     return createLookAtMatrix(this.position, this.position.add(this.getFront()), this.getUp())
   }
+
+  createViewMatrix(): Matrix {
+    return invertLookAtMatrix(this.createLookAtMatrix())
+  }
 }
