@@ -6,15 +6,6 @@ function clamp(x: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, x))
 }
 
-type MutationMatrices = {
-  identity?: Matrix
-  scale?: Matrix
-  rotation?: Matrix
-  orbital?: Matrix
-  translation?: Matrix
-  camera?: Matrix
-}
-
 function createRotMatX(theta: number): Matrix {
   const cos: number = Math.cos(theta)
   const sin: number = Math.sin(theta)
