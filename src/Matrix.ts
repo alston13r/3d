@@ -97,8 +97,19 @@ class Matrix {
   static FromArr(arr: number[][]): Matrix
   static FromArr(arr: number[]): Matrix
   static FromArr(arr: number[][] | number[]): Matrix {
-    if (arr[0] instanceof Array) return Matrix.Map(new Matrix(arr.length, arr[0].length), (e, i, j) => (arr as number[][])[i as number][j as number])
-    return Matrix.Map(new Matrix(1, arr.length), (e, i, j) => (arr as number[])[j as number])
+    let matrix: Matrix
+    if (arr[0] instanceof Array) {
+      matrix = new Matrix(arr.length, arr[0].length)
+      matrix.mat = arr as number[][]
+    } else {
+      matrix = new Matrix(1, arr.length)
+      matrix.mat = [arr] as number[][]
+    }
+    return matrix
+
+
+    // if (arr[0] instanceof Array) return Matrix.Map(new Matrix(arr.length, arr[0].length), (e, i, j) => (arr as number[][])[i as number][j as number])
+    // return Matrix.Map(new Matrix(1, arr.length), (e, i, j) => (arr as number[])[j as number])
   }
 
   static ToArray(matrix: Matrix): number[] {
