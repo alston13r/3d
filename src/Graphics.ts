@@ -135,14 +135,15 @@ class Graphics {
     x1: number, y1: number, x2: number, y2: number, x3: number, y3: number,
     stroke: boolean = true, fill: boolean = true
   ): void {
-    if (!stroke && !fill) return
+    // if (!stroke && !fill) return
     this.beginPath()
       .moveTo(x1, y1)
       .lineTo(x2, y2)
       .lineTo(x3, y3)
       .closePath()
-    if (stroke) this.stroke()
-    if (fill) this.fill()
+      .stroke()
+    // if (stroke) this.stroke()
+    // if (fill) this.fill()
   }
 
   triangleFromInstance(triangle: Triangle): void {
