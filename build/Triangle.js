@@ -22,14 +22,18 @@ class Triangle {
         return L1.cross(L2).normal();
     }
     applyMatrix(matrix) {
-        for (const point of [this.p1, this.p2, this.p3]) {
-            const mat = Matrix.FromArr([...point, 1]);
-            const modifiedMat = mat.dot(matrix);
-            const modifiedArr = modifiedMat.toArray();
-            point.x = modifiedArr[0];
-            point.y = modifiedArr[1];
-            point.z = modifiedArr[2];
-        }
+        const mat1 = Matrix.FromArr([this.p1.x, this.p1.y, this.p1.z, 1]).dot(matrix);
+        const mat2 = Matrix.FromArr([this.p2.x, this.p2.y, this.p2.z, 1]).dot(matrix);
+        const mat3 = Matrix.FromArr([this.p3.x, this.p3.y, this.p3.z, 1]).dot(matrix);
+        this.p1.x = mat1.mat[0][0];
+        this.p1.y = mat1.mat[0][1];
+        this.p1.z = mat1.mat[0][2];
+        this.p2.x = mat2.mat[0][0];
+        this.p2.y = mat2.mat[0][1];
+        this.p2.z = mat2.mat[0][2];
+        this.p3.x = mat3.mat[0][0];
+        this.p3.y = mat3.mat[0][1];
+        this.p3.z = mat3.mat[0][2];
         return this;
     }
     project(matrix) {

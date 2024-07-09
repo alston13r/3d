@@ -76,9 +76,18 @@ class Matrix {
         return Matrix.Div(this.copy(), a);
     }
     static FromArr(arr) {
-        if (arr[0] instanceof Array)
-            return Matrix.Map(new Matrix(arr.length, arr[0].length), (e, i, j) => arr[i][j]);
-        return Matrix.Map(new Matrix(1, arr.length), (e, i, j) => arr[j]);
+        let matrix;
+        if (arr[0] instanceof Array) {
+            matrix = new Matrix(arr.length, arr[0].length);
+            matrix.mat = arr;
+        }
+        else {
+            matrix = new Matrix(1, arr.length);
+            matrix.mat = [arr];
+        }
+        return matrix;
+        // if (arr[0] instanceof Array) return Matrix.Map(new Matrix(arr.length, arr[0].length), (e, i, j) => (arr as number[][])[i as number][j as number])
+        // return Matrix.Map(new Matrix(1, arr.length), (e, i, j) => (arr as number[])[j as number])
     }
     static ToArray(matrix) {
         const res = [];

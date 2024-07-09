@@ -25,6 +25,32 @@ const keybinds = {
     'Pitch up': 'ArrowDown',
     'Pitch down': 'ArrowUp'
 };
+function projectShape(shape, viewMatrix, raster) {
+    const worldMatrix = shape.getWorldMatrix();
+    for (const tri of shape.mesh.triangles) {
+        const triangle = new Triangle(tri.getP1(), tri.getP2(), tri.getP3());
+        const transformedTriangle = triangle.applyMatrix(worldMatrix);
+        const cameraRay = transformedTriangle.p1.sub(camera.position);
+        if (cameraRay.dot(camera.getFront()) < 0)
+            continue; // triangle is behind camera
+        const normal = transformedTriangle.getNormal();
+        if (normal.dot(cameraRay) < 0) { // triangle face is visible
+            const dp = lightDir.dot(normal);
+            const color = Color.FromGrey(clamp(Math.round(dp * 255), 30, 250)).toString();
+            // view
+            const viewedTriangle = transformedTriangle.applyMatrix(viewMatrix);
+            // clip against near and far planes
+            const triangles = scene.clipTriangleAgainstNearFarPlanes(viewedTriangle);
+            for (const clipped of triangles) {
+                // project
+                const projected = clipped.project(scene.projectionMatrix);
+                // scale
+                const scaled = scene.graphics.triangleToScreenSpace(projected);
+                raster.push({ triangle: scaled, color });
+            }
+        }
+    }
+}
 function loadInputs() {
     const FB = (keys[keybinds['Forward']] ? 1 : 0) - (keys[keybinds['Backward']] ? 1 : 0);
     const LR = (keys[keybinds['Right']] ? 1 : 0) - (keys[keybinds['Left']] ? 1 : 0);
@@ -51,81 +77,11 @@ function drawLoop(timestamp = 0) {
     loadInputs();
     scene.graphics.bg();
     cube.rotate(new Vec3(1, 0, 0), 0.008);
-    const cubeWorldMatrix = cube.getWorldMatrix();
-    const uvsphereWorldMatrix = uvsphere.getWorldMatrix();
-    const icosphereWorldMatrix = icosphere.getWorldMatrix();
     const viewMatrix = camera.createViewMatrix();
     const raster = [];
-    // const trianglesToProject: MeshTriangle[] = cube.mesh.triangles.concat(sphere.mesh.triangles)
-    for (const tri of cube.mesh.triangles) {
-        const triangle = new Triangle(tri.getP1(), tri.getP2(), tri.getP3());
-        const transformedTriangle = triangle.applyMatrix(cubeWorldMatrix);
-        const cameraRay = transformedTriangle.p1.sub(camera.position);
-        if (cameraRay.dot(camera.getFront()) < 0)
-            continue; // triangle is behind camera
-        const normal = transformedTriangle.getNormal();
-        if (normal.dot(cameraRay) < 0) { // triangle face is visible
-            const dp = lightDir.dot(normal);
-            const color = Color.FromGrey(clamp(Math.round(dp * 255), 30, 250)).toString();
-            // view
-            const viewedTriangle = transformedTriangle.applyMatrix(viewMatrix);
-            // clip against near and far planes
-            const triangles = scene.clipTriangleAgainstNearFarPlanes(viewedTriangle);
-            for (const clipped of triangles) {
-                // project
-                const projected = clipped.project(scene.projectionMatrix);
-                // scale
-                const scaled = scene.graphics.triangleToScreenSpace(projected);
-                raster.push({ triangle: scaled, color });
-            }
-        }
-    }
-    for (const tri of uvsphere.mesh.triangles) {
-        const triangle = new Triangle(tri.getP1(), tri.getP2(), tri.getP3());
-        const transformedTriangle = triangle.applyMatrix(uvsphereWorldMatrix);
-        const cameraRay = transformedTriangle.p1.sub(camera.position);
-        if (cameraRay.dot(camera.getFront()) < 0)
-            continue; // triangle is behind camera
-        const normal = transformedTriangle.getNormal();
-        if (normal.dot(cameraRay) < 0) { // triangle face is visible
-            const dp = lightDir.dot(normal);
-            const color = Color.FromGrey(clamp(Math.round(dp * 255), 30, 250)).toString();
-            // view
-            const viewedTriangle = transformedTriangle.applyMatrix(viewMatrix);
-            // clip against near and far planes
-            const triangles = scene.clipTriangleAgainstNearFarPlanes(viewedTriangle);
-            for (const clipped of triangles) {
-                // project
-                const projected = clipped.project(scene.projectionMatrix);
-                // scale
-                const scaled = scene.graphics.triangleToScreenSpace(projected);
-                raster.push({ triangle: scaled, color });
-            }
-        }
-    }
-    for (const tri of icosphere.mesh.triangles) {
-        const triangle = new Triangle(tri.getP1(), tri.getP2(), tri.getP3());
-        const transformedTriangle = triangle.applyMatrix(icosphereWorldMatrix);
-        const cameraRay = transformedTriangle.p1.sub(camera.position);
-        if (cameraRay.dot(camera.getFront()) < 0)
-            continue; // triangle is behind camera
-        const normal = transformedTriangle.getNormal();
-        if (normal.dot(cameraRay) < 0) { // triangle face is visible
-            const dp = lightDir.dot(normal);
-            const color = Color.FromGrey(clamp(Math.round(dp * 255), 30, 250)).toString();
-            // view
-            const viewedTriangle = transformedTriangle.applyMatrix(viewMatrix);
-            // clip against near and far planes
-            const triangles = scene.clipTriangleAgainstNearFarPlanes(viewedTriangle);
-            for (const clipped of triangles) {
-                // project
-                const projected = clipped.project(scene.projectionMatrix);
-                // scale
-                const scaled = scene.graphics.triangleToScreenSpace(projected);
-                raster.push({ triangle: scaled, color });
-            }
-        }
-    }
+    projectShape(cube, viewMatrix, raster);
+    projectShape(uvsphere, viewMatrix, raster);
+    projectShape(icosphere, viewMatrix, raster);
     raster.sort((a, b) => b.triangle.p1.z - a.triangle.p1.z);
     for (const obj of raster) {
         const toClip = obj.triangle;

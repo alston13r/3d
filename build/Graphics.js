@@ -107,17 +107,15 @@ class Graphics {
         this.context.fillRect(x, y, w, h);
     }
     triangle(x1, y1, x2, y2, x3, y3, stroke = true, fill = true) {
-        if (!stroke && !fill)
-            return;
+        // if (!stroke && !fill) return
         this.beginPath()
             .moveTo(x1, y1)
             .lineTo(x2, y2)
             .lineTo(x3, y3)
-            .closePath();
-        if (stroke)
-            this.stroke();
-        if (fill)
-            this.fill();
+            .closePath()
+            .stroke();
+        // if (stroke) this.stroke()
+        // if (fill) this.fill()
     }
     triangleFromInstance(triangle) {
         this.triangle(triangle.p1.x, triangle.p1.y, triangle.p2.x, triangle.p2.y, triangle.p3.x, triangle.p3.y);
