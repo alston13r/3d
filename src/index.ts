@@ -34,6 +34,43 @@ const keybinds: Record<string, string> = {
   'Pitch down': 'ArrowUp'
 }
 
+function projectShape(shape: MutableShape, viewMatrix: Matrix, raster: { triangle: Triangle, color: string }[]): void {
+  const worldMatrix: Matrix = shape.getWorldMatrix()
+
+  for (const tri of shape.mesh.triangles) {
+    const triangle = new Triangle(tri.getP1(), tri.getP2(), tri.getP3())
+
+    const transformedTriangle: Triangle = triangle.applyMatrix(worldMatrix)
+
+    const cameraRay: Vec3 = transformedTriangle.p1.sub(camera.position)
+
+    if (cameraRay.dot(camera.getFront()) < 0) continue // triangle is behind camera
+
+    const normal: Vec3 = transformedTriangle.getNormal()
+
+    if (normal.dot(cameraRay) < 0) { // triangle face is visible
+      const dp: number = lightDir.dot(normal)
+      const color: string = Color.FromGrey(clamp(Math.round(dp * 255), 30, 250)).toString()
+
+      // view
+      const viewedTriangle: Triangle = transformedTriangle.applyMatrix(viewMatrix)
+
+      // clip against near and far planes
+      const triangles: Triangle[] = scene.clipTriangleAgainstNearFarPlanes(viewedTriangle)
+
+      for (const clipped of triangles) {
+        // project
+        const projected: Triangle = clipped.project(scene.projectionMatrix)
+
+        // scale
+        const scaled: Triangle = scene.graphics.triangleToScreenSpace(projected)
+
+        raster.push({ triangle: scaled, color })
+      }
+    }
+  }
+}
+
 function loadInputs(): void {
   const FB: number = (keys[keybinds['Forward']] ? 1 : 0) - (keys[keybinds['Backward']] ? 1 : 0)
   const LR: number = (keys[keybinds['Right']] ? 1 : 0) - (keys[keybinds['Left']] ? 1 : 0)
@@ -69,112 +106,13 @@ function drawLoop(timestamp: number = 0): void {
 
   cube.rotate(new Vec3(1, 0, 0), 0.008)
 
-  const cubeWorldMatrix: Matrix = cube.getWorldMatrix()
-  const uvsphereWorldMatrix: Matrix = uvsphere.getWorldMatrix()
-  const icosphereWorldMatrix: Matrix = icosphere.getWorldMatrix()
-
   const viewMatrix: Matrix = camera.createViewMatrix()
 
   const raster: { triangle: Triangle, color: string }[] = []
 
-  for (const tri of cube.mesh.triangles) {
-    const triangle = new Triangle(tri.getP1(), tri.getP2(), tri.getP3())
-
-    const transformedTriangle: Triangle = triangle.applyMatrix(cubeWorldMatrix)
-
-    const cameraRay: Vec3 = transformedTriangle.p1.sub(camera.position)
-
-    if (cameraRay.dot(camera.getFront()) < 0) continue // triangle is behind camera
-
-    const normal: Vec3 = transformedTriangle.getNormal()
-
-    if (normal.dot(cameraRay) < 0) { // triangle face is visible
-      const dp: number = lightDir.dot(normal)
-      const color: string = Color.FromGrey(clamp(Math.round(dp * 255), 30, 250)).toString()
-
-      // view
-      const viewedTriangle: Triangle = transformedTriangle.applyMatrix(viewMatrix)
-
-      // clip against near and far planes
-      const triangles: Triangle[] = scene.clipTriangleAgainstNearFarPlanes(viewedTriangle)
-
-      for (const clipped of triangles) {
-        // project
-        const projected: Triangle = clipped.project(scene.projectionMatrix)
-
-        // scale
-        const scaled: Triangle = scene.graphics.triangleToScreenSpace(projected)
-
-        raster.push({ triangle: scaled, color })
-      }
-    }
-  }
-
-  for (const tri of uvsphere.mesh.triangles) {
-    const triangle = new Triangle(tri.getP1(), tri.getP2(), tri.getP3())
-
-    const transformedTriangle: Triangle = triangle.applyMatrix(uvsphereWorldMatrix)
-
-    const cameraRay: Vec3 = transformedTriangle.p1.sub(camera.position)
-
-    if (cameraRay.dot(camera.getFront()) < 0) continue // triangle is behind camera
-
-    const normal: Vec3 = transformedTriangle.getNormal()
-
-    if (normal.dot(cameraRay) < 0) { // triangle face is visible
-      const dp: number = lightDir.dot(normal)
-      const color: string = Color.FromGrey(clamp(Math.round(dp * 255), 30, 250)).toString()
-
-      // view
-      const viewedTriangle: Triangle = transformedTriangle.applyMatrix(viewMatrix)
-
-      // clip against near and far planes
-      const triangles: Triangle[] = scene.clipTriangleAgainstNearFarPlanes(viewedTriangle)
-
-      for (const clipped of triangles) {
-        // project
-        const projected: Triangle = clipped.project(scene.projectionMatrix)
-
-        // scale
-        const scaled: Triangle = scene.graphics.triangleToScreenSpace(projected)
-
-        raster.push({ triangle: scaled, color })
-      }
-    }
-  }
-
-  for (const tri of icosphere.mesh.triangles) {
-    const triangle = new Triangle(tri.getP1(), tri.getP2(), tri.getP3())
-
-    const transformedTriangle: Triangle = triangle.applyMatrix(icosphereWorldMatrix)
-
-    const cameraRay: Vec3 = transformedTriangle.p1.sub(camera.position)
-
-    if (cameraRay.dot(camera.getFront()) < 0) continue // triangle is behind camera
-
-    const normal: Vec3 = transformedTriangle.getNormal()
-
-    if (normal.dot(cameraRay) < 0) { // triangle face is visible
-      const dp: number = lightDir.dot(normal)
-      const color: string = Color.FromGrey(clamp(Math.round(dp * 255), 30, 250)).toString()
-
-      // view
-      const viewedTriangle: Triangle = transformedTriangle.applyMatrix(viewMatrix)
-
-      // clip against near and far planes
-      const triangles: Triangle[] = scene.clipTriangleAgainstNearFarPlanes(viewedTriangle)
-
-      for (const clipped of triangles) {
-        // project
-        const projected: Triangle = clipped.project(scene.projectionMatrix)
-
-        // scale
-        const scaled: Triangle = scene.graphics.triangleToScreenSpace(projected)
-
-        raster.push({ triangle: scaled, color })
-      }
-    }
-  }
+  projectShape(cube, viewMatrix, raster)
+  projectShape(uvsphere, viewMatrix, raster)
+  projectShape(icosphere, viewMatrix, raster)
 
   raster.sort((a, b) => b.triangle.p1.z - a.triangle.p1.z)
 
