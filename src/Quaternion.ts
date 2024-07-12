@@ -1,136 +1,136 @@
-class Quaternion {
-  real: number
-  imaginary: Vec3
+// class Quaternion {
+//   real: number
+//   imaginary: Vec3
 
-  constructor(real: number = 0, imaginary: Vec3 = new Vec3()) {
-    this.real = real
-    this.imaginary = imaginary
-  }
+//   constructor(real: number = 0, imaginary: Vec3 = new Vec3()) {
+//     this.real = real
+//     this.imaginary = imaginary
+//   }
 
-  static Copy(q: Quaternion): Quaternion {
-    return new Quaternion(q.real, q.imaginary.copy())
-  }
+//   static Copy(q: Quaternion): Quaternion {
+//     return new Quaternion(q.real, q.imaginary.copy())
+//   }
 
-  copy(): Quaternion {
-    return Quaternion.Copy(this)
-  }
+//   copy(): Quaternion {
+//     return Quaternion.Copy(this)
+//   }
 
-  static Add(q1: Quaternion, q2: Quaternion): Quaternion {
-    q1.real += q2.real
-    Vec3.Add(q1.imaginary, q2.imaginary)
-    return q1
-  }
+//   static Add(q1: Quaternion, q2: Quaternion): Quaternion {
+//     q1.real += q2.real
+//     Vec3.Add(q1.imaginary, q2.imaginary)
+//     return q1
+//   }
 
-  add(q: Quaternion): Quaternion {
-    return Quaternion.Add(this.copy(), q)
-  }
+//   add(q: Quaternion): Quaternion {
+//     return Quaternion.Add(this.copy(), q)
+//   }
 
-  static Scale(q: Quaternion, n: number): Quaternion {
-    q.real *= n
-    Vec3.Scale(q.imaginary, n)
-    return q
-  }
+//   static Scale(q: Quaternion, n: number): Quaternion {
+//     q.real *= n
+//     Vec3.Scale(q.imaginary, n)
+//     return q
+//   }
 
-  scale(n: number): Quaternion {
-    return Quaternion.Scale(this.copy(), n)
-  }
+//   scale(n: number): Quaternion {
+//     return Quaternion.Scale(this.copy(), n)
+//   }
 
-  static Sub(q1: Quaternion, q2: Quaternion): Quaternion {
-    q1.real -= q2.real
-    Vec3.Sub(q1.imaginary, q2.imaginary)
-    return q1
-  }
+//   static Sub(q1: Quaternion, q2: Quaternion): Quaternion {
+//     q1.real -= q2.real
+//     Vec3.Sub(q1.imaginary, q2.imaginary)
+//     return q1
+//   }
 
-  sub(q: Quaternion): Quaternion {
-    return Quaternion.Sub(this.copy(), q)
-  }
+//   sub(q: Quaternion): Quaternion {
+//     return Quaternion.Sub(this.copy(), q)
+//   }
 
-  static Div(q: Quaternion, n: number): Quaternion {
-    q.real /= n
-    Vec3.Scale(q.imaginary, 1 / n)
-    return q
-  }
+//   static Div(q: Quaternion, n: number): Quaternion {
+//     q.real /= n
+//     Vec3.Scale(q.imaginary, 1 / n)
+//     return q
+//   }
 
-  div(n: number): Quaternion {
-    return Quaternion.Div(this.copy(), n)
-  }
+//   div(n: number): Quaternion {
+//     return Quaternion.Div(this.copy(), n)
+//   }
 
-  static CopyFrom(q1: Quaternion, q2: Quaternion): Quaternion {
-    q1.real = q2.real
-    Vec3.CopyFrom(q1.imaginary, q2.imaginary)
-    return q1
-  }
+//   static CopyFrom(q1: Quaternion, q2: Quaternion): Quaternion {
+//     q1.real = q2.real
+//     Vec3.CopyFrom(q1.imaginary, q2.imaginary)
+//     return q1
+//   }
 
-  static Dot(q1: Quaternion, q2: Quaternion): number {
-    return q1.imaginary.dot(q2.imaginary)
-  }
+//   static Dot(q1: Quaternion, q2: Quaternion): number {
+//     return q1.imaginary.dot(q2.imaginary)
+//   }
 
-  dot(q: Quaternion): number {
-    return Quaternion.Dot(this, q)
-  }
+//   dot(q: Quaternion): number {
+//     return Quaternion.Dot(this, q)
+//   }
 
-  static Cross(q1: Quaternion, q2: Quaternion): Quaternion {
-    return new Quaternion(0, q1.imaginary.cross(q2.imaginary))
-  }
+//   static Cross(q1: Quaternion, q2: Quaternion): Quaternion {
+//     return new Quaternion(0, q1.imaginary.cross(q2.imaginary))
+//   }
 
-  cross(q: Quaternion): Quaternion {
-    return Quaternion.Cross(this, q)
-  }
+//   cross(q: Quaternion): Quaternion {
+//     return Quaternion.Cross(this, q)
+//   }
 
-  static Mul(q1: Quaternion, q2: Quaternion): Quaternion {
-    let real = q1.real * q2.real
-    let imaginary0 = q2.scale(q1.real).imaginary
-    let imaginary1 = q1.scale(q2.real).imaginary
-    let imaginary2 = q1.cross(q2).imaginary
-    let imaginary = imaginary0.add(imaginary1).add(imaginary2)
-    return new Quaternion(real - q1.dot(q2), imaginary)
-  }
+//   static Mul(q1: Quaternion, q2: Quaternion): Quaternion {
+//     let real = q1.real * q2.real
+//     let imaginary0 = q2.scale(q1.real).imaginary
+//     let imaginary1 = q1.scale(q2.real).imaginary
+//     let imaginary2 = q1.cross(q2).imaginary
+//     let imaginary = imaginary0.add(imaginary1).add(imaginary2)
+//     return new Quaternion(real - q1.dot(q2), imaginary)
+//   }
 
-  mul(q: Quaternion): Quaternion {
-    return Quaternion.Mul(this, q)
-  }
+//   mul(q: Quaternion): Quaternion {
+//     return Quaternion.Mul(this, q)
+//   }
 
-  static Conjugate(q: Quaternion): Quaternion {
-    Vec3.Scale(q.imaginary, -1)
-    return q
-  }
+//   static Conjugate(q: Quaternion): Quaternion {
+//     Vec3.Scale(q.imaginary, -1)
+//     return q
+//   }
 
-  conjugate(): Quaternion {
-    return Quaternion.Conjugate(this.copy())
-  }
+//   conjugate(): Quaternion {
+//     return Quaternion.Conjugate(this.copy())
+//   }
 
-  static Mag(q: Quaternion): number {
-    return Math.sqrt(q.real ** 2 + q.imaginary.mag() ** 2)
-  }
+//   static Mag(q: Quaternion): number {
+//     return Math.sqrt(q.real ** 2 + q.imaginary.mag() ** 2)
+//   }
 
-  mag(): number {
-    return Quaternion.Mag(this)
-  }
+//   mag(): number {
+//     return Quaternion.Mag(this)
+//   }
 
-  static Hat(q: Quaternion): Quaternion {
-    let mag = q.mag()
-    if (mag != 0) Quaternion.Div(q, mag)
-    return q
-  }
+//   static Hat(q: Quaternion): Quaternion {
+//     let mag = q.mag()
+//     if (mag != 0) Quaternion.Div(q, mag)
+//     return q
+//   }
 
-  hat(): Quaternion {
-    return Quaternion.Hat(this.copy())
-  }
+//   hat(): Quaternion {
+//     return Quaternion.Hat(this.copy())
+//   }
 
-  static Inverse(q: Quaternion): Quaternion {
-    let den = q.mag() ** 2
-    return Quaternion.Div(Quaternion.Conjugate(q), den)
-  }
+//   static Inverse(q: Quaternion): Quaternion {
+//     let den = q.mag() ** 2
+//     return Quaternion.Div(Quaternion.Conjugate(q), den)
+//   }
 
-  inverse(): Quaternion {
-    return Quaternion.Inverse(this.copy())
-  }
+//   inverse(): Quaternion {
+//     return Quaternion.Inverse(this.copy())
+//   }
 
-  static AngleBetween(q1: Quaternion, q2: Quaternion): number {
-    return Math.acos(q1.real * q2.real + q1.dot(q2) / q1.mag() / q2.mag())
-  }
+//   static AngleBetween(q1: Quaternion, q2: Quaternion): number {
+//     return Math.acos(q1.real * q2.real + q1.dot(q2) / q1.mag() / q2.mag())
+//   }
 
-  angleTo(q: Quaternion): number {
-    return Quaternion.AngleBetween(this, q)
-  }
-}
+//   angleTo(q: Quaternion): number {
+//     return Quaternion.AngleBetween(this, q)
+//   }
+// }
