@@ -1,35 +1,39 @@
-// class MutableObject {
-//   position: Vec3 = new Vec3()
-//   orientation: Matrix = Matrix.MakeIdentity()
+class MutableObject {
+  position: Vec3 = vec3.create()
+  orientation: Mat4 = mat4.create()
 
-//   translate(translation: Vec3): MutableObject {
-//     Vec3.Add(this.position, translation)
-//     return this
-//   }
+  translate(translation: Vec3): MutableObject {
+    vec3.add(this.position, this.position, translation)
+    return this
+  }
 
-//   moveTo(position: Vec3): MutableObject {
-//     Vec3.CopyFrom(this.position, position)
-//     return this
-//   }
+  moveTo(position: Vec3): MutableObject {
+    vec3.copy(this.position, position)
+    return this
+  }
 
-//   rotate(axis: Vec3, theta: number): MutableObject {
-//     this.orientation = Matrix.Dot(this.orientation, createRotMatQuaternion(axis, theta))
-//     return this
-//   }
+  rotate(axis: Vec3, theta: number): MutableObject {
+    mat4.rotate(this.orientation, this.orientation, theta, axis)
+    return this
+  }
 
-//   getRight(): Vec3 {
-//     return new Vec3(...this.orientation.mat[0])
-//   }
+  getRight(): Vec3 {
+    return vec3.fromValues(this.orientation[0], this.orientation[1], this.orientation[2])
+  }
 
-//   getUp(): Vec3 {
-//     return new Vec3(...this.orientation.mat[1])
-//   }
+  getUp(): Vec3 {
+    return vec3.fromValues(this.orientation[4], this.orientation[5], this.orientation[6])
+  }
 
-//   getFront(): Vec3 {
-//     return new Vec3(...this.orientation.mat[2])
-//   }
+  getFront(): Vec3 {
+    return vec3.fromValues(this.orientation[8], this.orientation[9], this.orientation[10])
+  }
 
-//   getWorldMatrix(): Matrix {
-//     return this.orientation.dot(createTranslationMat(this.position))
-//   }
-// }
+  getWorldMatrix(): Mat4 {
+    return mat4.multiply(
+      mat4.create(),
+      this.orientation,
+      mat4.fromTranslation(mat4.create(), this.position)
+    )
+  }
+}
