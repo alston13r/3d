@@ -361,7 +361,7 @@ const mat4 = {
     let b10, b11, b12
     let b20, b21, b22
 
-    if (len < matrix.EPSILON) {
+    if (len < matrix.Epsilon) {
       return null
     }
 
