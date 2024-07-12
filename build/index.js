@@ -1,98 +1,156 @@
 "use strict";
-const scene = new Scene();
-const camera = scene.camera;
-const cube = new Cube()
-    .translate(new Vec3(2, 0, 3))
-    .centerPoints();
-const uvsphere = new UVSphere(0.5, 10, 10)
-    .translate(new Vec3(-2, 0, 3));
-const icosphere = new Icosphere(0.5, 2)
-    .translate(new Vec3(0, 2, 3));
-const objects = [cube, uvsphere, icosphere];
-const keys = {};
-window.addEventListener('keydown', e => keys[e.key] = true);
-window.addEventListener('keyup', e => keys[e.key] = false);
-const lightDir = new Vec3(-0.1, -0.1, 1).normal().scale(-1);
-const keybinds = {
-    'Forward': 'w',
-    'Backward': 's',
-    'Left': 'a',
-    'Right': 'd',
-    'Up': 'e',
-    'Down': 'q',
-    'Yaw left': 'ArrowLeft',
-    'Yaw right': 'ArrowRight',
-    'Pitch up': 'ArrowDown',
-    'Pitch down': 'ArrowUp'
-};
-function projectShape(shape, viewMatrix, raster) {
-    const worldMatrix = shape.getWorldMatrix();
-    for (const tri of shape.mesh.triangles) {
-        const triangle = new Triangle(tri.getP1(), tri.getP2(), tri.getP3());
-        const transformedTriangle = triangle.applyMatrix(worldMatrix);
-        const cameraRay = transformedTriangle.p1.sub(camera.position);
-        if (cameraRay.dot(camera.getFront()) < 0)
-            continue; // triangle is behind camera
-        const normal = transformedTriangle.getNormal();
-        if (normal.dot(cameraRay) < 0) { // triangle face is visible
-            const dp = lightDir.dot(normal);
-            const color = Color.FromGrey(clamp(Math.round(dp * 255), 30, 250)).toString();
-            // view
-            const viewedTriangle = transformedTriangle.applyMatrix(viewMatrix);
-            // clip against near and far planes
-            const triangles = scene.clipTriangleAgainstNearFarPlanes(viewedTriangle);
-            for (const clipped of triangles) {
-                // project
-                const projected = clipped.project(scene.projectionMatrix);
-                // scale
-                const scaled = scene.graphics.triangleToScreenSpace(projected);
-                raster.push({ triangle: scaled, color });
-            }
-        }
+let cubeRotation = 0;
+let deltaTime = 0;
+main();
+function main() {
+    const canvas = document.body.appendChild(document.createElement('canvas'));
+    canvas.width = 800;
+    canvas.height = 600;
+    const gl = canvas.getContext('webgl');
+    if (gl === null) {
+        alert("Unable to initialize WebGL. Your browser or machine may not support it.");
+        return;
     }
-}
-function loadInputs() {
-    const FB = (keys[keybinds['Forward']] ? 1 : 0) - (keys[keybinds['Backward']] ? 1 : 0);
-    const LR = (keys[keybinds['Right']] ? 1 : 0) - (keys[keybinds['Left']] ? 1 : 0);
-    const UD = (keys[keybinds['Up']] ? 1 : 0) - (keys[keybinds['Down']] ? 1 : 0);
-    const Y = (keys[keybinds['Yaw left']] ? 1 : 0) - (keys[keybinds['Yaw right']] ? 1 : 0);
-    const P = (keys[keybinds['Pitch up']] ? 1 : 0) - (keys[keybinds['Pitch down']] ? 1 : 0);
-    const right = camera.getRight();
-    const up = camera.getUp();
-    const front = camera.getFront();
-    camera.translate(front.normal().scale(FB * 0.02));
-    camera.translate(right.normal().scale(LR * 0.02));
-    camera.translate(up.normal().scale(UD * 0.02));
-    camera.rotate(up, Y * 0.01);
-    camera.rotate(camera.getRight(), P * 0.01);
-}
-function getLightColor(dp) {
-    const x = clamp(Math.round(dp * 255), 30, 250);
-    return new Color(x, x, x).toString();
-}
-let lastTimestamp = 0;
-function drawLoop(timestamp = 0) {
-    const deltaTime = timestamp - lastTimestamp;
-    lastTimestamp = timestamp;
-    loadInputs();
-    scene.graphics.bg();
-    cube.rotate(new Vec3(1, 0, 0), 0.008);
-    const viewMatrix = camera.createViewMatrix();
-    const raster = [];
-    projectShape(cube, viewMatrix, raster);
-    projectShape(uvsphere, viewMatrix, raster);
-    projectShape(icosphere, viewMatrix, raster);
-    raster.sort((a, b) => b.triangle.p1.z - a.triangle.p1.z);
-    for (const obj of raster) {
-        const toClip = obj.triangle;
-        scene.graphics.fillStyle = obj.color;
-        scene.graphics.strokeStyle = obj.color;
-        const triangles = scene.clipTriangleAgainstBorderPlanes(toClip);
-        for (const clipped of triangles) {
-            scene.graphics.triangleFromInstance(clipped);
-        }
+    gl.clearColor(0, 0, 0, 1);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    const vsSource = `
+    attribute vec4 aVertexPosition;
+    attribute vec3 aVertexNormal;
+    attribute vec2 aTextureCoord;
+
+    uniform mat4 uNormalMatrix;
+    uniform mat4 uModelViewMatrix;
+    uniform mat4 uProjectionMatrix;
+
+    varying highp vec2 vTextureCoord;
+    varying highp vec3 vLighting;
+
+    void main(void) {
+      gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
+      vTextureCoord = aTextureCoord;
+
+      highp vec3 ambientLight = vec3(0.3, 0.3, 0.3);
+      highp vec3 directionalLightColor = vec3(1, 1, 1);
+      highp vec3 directionalVector = normalize(vec3(0.85, 0.8, 0.75));
+
+      highp vec4 transformedNormal = uNormalMatrix * vec4(aVertexNormal, 1.0);
+
+      highp float directional = max(dot(transformedNormal.xyz, directionalVector), 0.0);
+      vLighting = ambientLight + (directionalLightColor * directional);
     }
-    window.requestAnimationFrame(drawLoop);
+  `;
+    const fsSource = `
+    varying highp vec2 vTextureCoord;
+    varying highp vec3 vLighting;
+
+    uniform sampler2D uSampler;
+
+    void main(void) {
+      highp vec4 texelColor = texture2D(uSampler, vTextureCoord);
+
+      gl_FragColor = vec4(texelColor.rgb * vLighting, texelColor.a);
+    }
+  `;
+    const shaderProgram = initShaderProgram(gl, vsSource, fsSource);
+    // Collect all the info needed to use the shader program.
+    // Look up which attributes our shader program is using
+    // for aVertexPosition, aVertexColor and also
+    // look up uniform locations.
+    const programInfo = {
+        program: shaderProgram,
+        attribLocations: {
+            vertexPosition: gl.getAttribLocation(shaderProgram, 'aVertexPosition'),
+            vertexNormal: gl.getAttribLocation(shaderProgram, 'aVertexNormal'),
+            textureCoord: gl.getAttribLocation(shaderProgram, 'aTextureCoord')
+        },
+        uniformLocations: {
+            projectionMatrix: gl.getUniformLocation(shaderProgram, 'uProjectionMatrix'),
+            modelViewMatrix: gl.getUniformLocation(shaderProgram, 'uModelViewMatrix'),
+            normalMatrix: gl.getUniformLocation(shaderProgram, 'uNormalMatrix'),
+            uSampler: gl.getUniformLocation(shaderProgram, 'uSampler')
+        }
+    };
+    const buffers = initBuffers(gl);
+    // Load texture
+    // const texture = loadTexture(gl, "./cubetexture.png") as WebGLTexture
+    const texture = loadTexture(gl, cubeTextureURI);
+    // Flip image pixels into the bottom-to-top order that WebGL expects.
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+    let then = 0;
+    function render(now) {
+        now *= 0.001;
+        deltaTime = now - then;
+        then = now;
+        drawScene(gl, programInfo, buffers, texture, cubeRotation);
+        cubeRotation += deltaTime;
+        requestAnimationFrame(render);
+    }
+    requestAnimationFrame(render);
 }
-window.requestAnimationFrame(drawLoop);
+function loadTexture(gl, url) {
+    const texture = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    // Because images have to be downloaded over the internet
+    // they might take a moment until they are ready.
+    // Until then put a single pixel in the texture so we can
+    // use it immediately. When the image has finished downloading
+    // we'll update the texture with the contents of the image.
+    const level = 0;
+    const internalFormat = gl.RGBA;
+    const width = 1;
+    const height = 1;
+    const border = 0;
+    const srcFormat = gl.RGBA;
+    const srcType = gl.UNSIGNED_BYTE;
+    const pixel = new Uint8Array([0, 0, 255, 255]); // opaque blue
+    gl.texImage2D(gl.TEXTURE_2D, level, internalFormat, width, height, border, srcFormat, srcType, pixel);
+    const image = new Image();
+    image.onload = () => {
+        gl.bindTexture(gl.TEXTURE_2D, texture);
+        gl.texImage2D(gl.TEXTURE_2D, level, internalFormat, srcFormat, srcType, image);
+        // WebGL1 has different requirements for power of 2 images
+        // vs non power of 2 images so check if the image is a
+        // power of 2 in both dimensions.
+        if (isPowerOf2(image.width) && isPowerOf2(image.height)) {
+            // Yes, it's a power of 2. Generate mips.
+            gl.generateMipmap(gl.TEXTURE_2D);
+        }
+        else {
+            // No, it's not a power of 2. Turn off mips and set
+            // wrapping to clamp to edge
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        }
+    };
+    image.src = url;
+    return texture;
+}
+function isPowerOf2(value) {
+    return (value & (value - 1)) === 0;
+}
+function initShaderProgram(gl, vsSource, fsSource) {
+    const vertexShader = loadShader(gl, gl.VERTEX_SHADER, vsSource);
+    const fragmentShader = loadShader(gl, gl.FRAGMENT_SHADER, fsSource);
+    const shaderProgram = gl.createProgram();
+    gl.attachShader(shaderProgram, vertexShader);
+    gl.attachShader(shaderProgram, fragmentShader);
+    gl.linkProgram(shaderProgram);
+    if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
+        alert(`Unable to initialize the shader program: ${gl.getProgramInfoLog(shaderProgram)}`);
+        return null;
+    }
+    return shaderProgram;
+}
+function loadShader(gl, type, source) {
+    const shader = gl.createShader(type);
+    gl.shaderSource(shader, source);
+    gl.compileShader(shader);
+    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+        alert(`An error occurred compiling the shaders: ${gl.getShaderInfoLog(shader)}`);
+        gl.deleteShader(shader);
+        return null;
+    }
+    return shader;
+}
 //# sourceMappingURL=index.js.map
