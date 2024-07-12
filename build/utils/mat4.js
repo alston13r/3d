@@ -299,7 +299,7 @@ const mat4 = {
         let b00, b01, b02;
         let b10, b11, b12;
         let b20, b21, b22;
-        if (len < matrix.EPSILON) {
+        if (len < matrix.Epsilon) {
             return null;
         }
         len = 1 / len;
