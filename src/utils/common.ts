@@ -30,63 +30,39 @@ declare type Vec2 = IndexedCollection | [number, number]
 declare type Vec3 = IndexedCollection | [number, number, number]
 declare type Vec4 = IndexedCollection | [number, number, number, number]
 
+declare type ReadonlyMat2 = IndexedCollection
+  | readonly
+  [number, number,
+    number, number]
+declare type ReadonlyMat2d = IndexedCollection
+  | readonly
+  [number, number,
+    number, number,
+    number, number]
+declare type ReadonlyMat3 = IndexedCollection
+  | readonly
+  [number, number, number,
+    number, number, number,
+    number, number, number]
+declare type ReadonlyMat4 = IndexedCollection
+  | readonly
+  [number, number, number, number,
+    number, number, number, number,
+    number, number, number, number,
+    number, number, number, number]
 
+declare type ReadonlyQuat = IndexedCollection
+  | readonly [number, number, number, number]
+declare type ReadonlyQuat2 = IndexedCollection
+  | readonly [number, number, number, number, number, number, number, number]
 
-
-// // prettier-ignore
-// declare type ReadonlyMat2 =
-//   | readonly [
-//     number, number,
-//     number, number
-//   ]
-//   | IndexedCollection;
-
-// // prettier-ignore
-// declare type ReadonlyMat2d =
-//   | readonly [
-//     number, number,
-//     number, number,
-//     number, number
-//   ]
-//   | IndexedCollection;
-
-// // prettier-ignore
-// declare type ReadonlyMat3 =
-//   | readonly [
-//     number, number, number,
-//     number, number, number,
-//     number, number, number
-//   ]
-//   | IndexedCollection;
-
-// // prettier-ignore
-// declare type ReadonlyMat4 =
-//   | readonly [
-//     number, number, number, number,
-//     number, number, number, number,
-//     number, number, number, number,
-//     number, number, number, number
-//   ]
-//   | IndexedCollection;
-
-// declare type ReadonlyQuat =
-//   | readonly [number, number, number, number]
-//   | IndexedCollection;
-
-// declare type ReadonlyQuat2 =
-//   | readonly [number, number, number, number, number, number, number, number]
-//   | IndexedCollection;
-
-// declare type ReadonlyVec2 = readonly [number, number] | IndexedCollection;
-// declare type ReadonlyVec3 = readonly [number, number, number] | IndexedCollection;
-// declare type ReadonlyVec4 =
-//   | readonly [number, number, number, number]
-//   | IndexedCollection;
-
+declare type ReadonlyVec2 = IndexedCollection | readonly [number, number]
+declare type ReadonlyVec3 = IndexedCollection | readonly [number, number, number]
+declare type ReadonlyVec4 = IndexedCollection | readonly [number, number, number, number]
 
 const matrix = {
-  EPSILON: 0.000001,
-  ANGLE_ORDER: 'zyx',
+  Epsilon: 0.000001,
+  AngleOrder: 'zyx',
   ArrayType: (typeof Float32Array !== undefined) ? Float32Array : Array<number>,
   setMatrixArrayType(type: Float32ArrayConstructor | ArrayConstructor) {
     this.ArrayType = type
@@ -101,6 +77,6 @@ const matrix = {
     return a * this.radian
   },
   equals(a: number, b: number): boolean {
-    return Math.abs(a - b) <= this.EPSILON * Math.max(1, Math.abs(a), Math.abs(b))
+    return Math.abs(a - b) <= this.Epsilon * Math.max(1, Math.abs(a), Math.abs(b))
   }
 }
