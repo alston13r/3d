@@ -1,9 +1,9 @@
 "use strict";
 // class MutableObject {
-//   position: Vec3 = new Vec3()
-//   orientation: Matrix = Matrix.MakeIdentity()
+//   position: Vec3 = vec3.create()
+//   orientation: Mat4 = mat4.create()
 //   translate(translation: Vec3): MutableObject {
-//     Vec3.Add(this.position, translation)
+//     vec3.add(this.position, this.position, translation)
 //     return this
 //   }
 //   moveTo(position: Vec3): MutableObject {
