@@ -324,7 +324,7 @@ const mat4 = {
     return out
   },
 
-  scale(out: Mat4, a: Mat4, v: Mat4): Mat4 {
+  scale(out: Mat4, a: ReadonlyMat4, v: ReadonlyVec3): Mat4 {
     let x = v[0],
       y = v[1],
       z = v[2]
@@ -349,7 +349,7 @@ const mat4 = {
     return out;
   },
 
-  rotate(out: Mat4, a: Mat4, rad: number, axis: Mat4): Mat4 | null {
+  rotate(out: Mat4, a: ReadonlyMat4, rad: number, axis: ReadonlyVec3): Mat4 | null {
     let x = axis[0], y = axis[1], z = axis[2]
     let len = Math.hypot(x, y, z)
 
@@ -416,11 +416,10 @@ const mat4 = {
       out[14] = a[14]
       out[15] = a[15]
     }
-
     return out
   },
 
-  rotateX(out: Mat4, a: Mat4, rad: number): Mat4 {
+  rotateX(out: Mat4, a: ReadonlyVec3, rad: number): Mat4 {
     let s = Math.sin(rad)
     let c = Math.cos(rad)
     let a10 = a[4]
@@ -455,7 +454,7 @@ const mat4 = {
     return out
   },
 
-  rotateY(out: Mat4, a: Mat4, rad: number): Mat4 {
+  rotateY(out: Mat4, a: ReadonlyVec3, rad: number): Mat4 {
     let s = Math.sin(rad)
     let c = Math.cos(rad)
     let a00 = a[0]
@@ -490,7 +489,7 @@ const mat4 = {
     return out
   },
 
-  rotateZ(out: Mat4, a: Mat4, rad: number): Mat4 {
+  rotateZ(out: Mat4, a: ReadonlyVec3, rad: number): Mat4 {
     let s = Math.sin(rad)
     let c = Math.cos(rad)
     let a00 = a[0]
@@ -525,7 +524,7 @@ const mat4 = {
     return out
   },
 
-  fromTranslation(out: Mat4, v: Mat4): Mat4 {
+  fromTranslation(out: Mat4, v: ReadonlyVec3): Mat4 {
     out[0] = 1
     out[1] = 0
     out[2] = 0
