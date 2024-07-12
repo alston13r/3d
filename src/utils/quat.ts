@@ -31,7 +31,7 @@ const quat = {
   getAxisAngle(outAxis: Vec3, q: Quat): number {
     let rad = Math.acos(q[3]) * 2
     let s = Math.sin(rad / 2)
-    if (s > matrix.EPSILON) {
+    if (s > matrix.Epsilon) {
       outAxis[0] = q[0] / s
       outAxis[1] = q[1] / s
       outAxis[2] = q[2] / s
