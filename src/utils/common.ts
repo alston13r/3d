@@ -78,5 +78,9 @@ const matrix = {
   },
   equals(a: number, b: number): boolean {
     return Math.abs(a - b) <= this.Epsilon * Math.max(1, Math.abs(a), Math.abs(b))
+  },
+  roundSymm(a: number): number {
+    if (a >= 0) return Math.round(a)
+    return (a % 0.5 === 0) ? Math.floor(a) : Math.round(a)
   }
 }
