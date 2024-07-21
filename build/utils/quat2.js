@@ -1,14 +1,4 @@
 "use strict";
-// import * as glMatrix from "./common.js";
-// import * as quat from "./quat.js";
-// import * as mat4 from "./mat4.js";
-// /**
-//  * Dual Quaternion<br>
-//  * Format: [real, dual]<br>
-//  * Quaternion format: XYZW<br>
-//  * Make sure to have normalized dual quaternions, otherwise the functions may not work as intended.<br>
-//  * @module quat2
-//  */
 // /**
 //  * Creates a new identity dual quat
 //  *

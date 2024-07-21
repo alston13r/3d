@@ -1,27 +1,83 @@
-// class Cube extends MutableShape {
-//   static P1: Vec3 = new Vec3(0, 0, 0)
-//   static P2: Vec3 = new Vec3(0, 1, 0)
-//   static P3: Vec3 = new Vec3(1, 0, 0)
-//   static P4: Vec3 = new Vec3(1, 1, 0)
-//   static P5: Vec3 = new Vec3(1, 0, 1)
-//   static P6: Vec3 = new Vec3(1, 1, 1)
-//   static P7: Vec3 = new Vec3(0, 0, 1)
-//   static P8: Vec3 = new Vec3(0, 1, 1)
+class Cube {
+  static FrontBottomLeft = vec3.fromValues(-1, -1, 1)
+  static FrontTopLeft = vec3.fromValues(-1, 1, 1)
+  static FrontTopRight = vec3.fromValues(1, 1, 1)
+  static FrontBottomRight = vec3.fromValues(1, -1, 1)
 
-//   constructor() {
-//     super(
-//       [
-//         Cube.P1, Cube.P2, Cube.P3, Cube.P4,
-//         Cube.P5, Cube.P6, Cube.P7, Cube.P8
-//       ],
-//       [
-//         [0, 1, 2], [1, 3, 2],
-//         [6, 7, 0], [7, 1, 0],
-//         [4, 5, 6], [5, 7, 6],
-//         [2, 3, 4], [3, 5, 4],
-//         [1, 7, 3], [7, 5, 3],
-//         [6, 0, 4], [0, 2, 4]
-//       ]
-//     )
-//   }
-// }
+  static BackBottomLeft = vec3.fromValues(-1, -1, -1)
+  static BackTopLeft = vec3.fromValues(-1, 1, -1)
+  static BackTopRight = vec3.fromValues(1, 1, -1)
+  static BackBottomRight = vec3.fromValues(1, -1, -1)
+
+  static FrontFace = [
+    ...this.FrontBottomLeft, ...this.FrontBottomRight,
+    ...this.FrontTopRight, ...this.FrontTopLeft]
+  static BackFace = [
+    ...this.BackBottomLeft, ...this.BackTopLeft,
+    ...this.BackTopRight, ...this.BackBottomRight]
+  static TopFace = [
+    ...this.BackTopLeft, ...this.FrontTopLeft,
+    ...this.FrontTopRight, ...this.BackTopRight]
+  static BottomFace = [
+    ...this.BackBottomLeft, ...this.BackBottomRight,
+    ...this.FrontBottomRight, ...this.FrontBottomLeft]
+  static RightFace = [
+    ...this.BackBottomRight, ...this.BackTopRight,
+    ...this.FrontTopRight, ...this.FrontBottomRight]
+  static LeftFace = [
+    ...this.BackBottomLeft, ...this.FrontBottomLeft,
+    ...this.FrontTopLeft, ...this.BackTopLeft]
+
+  static Positions = [
+    ...this.FrontFace,
+    ...this.BackFace,
+    ...this.TopFace,
+    ...this.BottomFace,
+    ...this.RightFace,
+    ...this.LeftFace
+  ]
+
+  static Indices = [
+    0, 1, 2, 0, 2, 3,
+    4, 5, 6, 4, 6, 7,
+    8, 9, 10, 8, 10, 11,
+    12, 13, 14, 12, 14, 15,
+    16, 17, 18, 16, 18, 19,
+    20, 21, 22, 20, 22, 23
+  ]
+
+  static VertexCount = this.Indices.length
+
+  positionMat = mat4.create()
+  orientationMat = mat4.create()
+  scaleMat = mat4.create()
+
+  constructor(position: Vec3 = [0, 0, 0]) {
+    this.positionMat = mat4.fromTranslation(this.positionMat, position)
+  }
+
+  getModelView(): Mat4 {
+    const modelView = mat4.create()
+    mat4.multiply(
+      modelView,
+      modelView,
+      this.positionMat
+    )
+    mat4.multiply(
+      modelView,
+      modelView,
+      this.orientationMat
+    )
+    return modelView
+  }
+
+  translate(translation: Vec3): Cube {
+    mat4.translate(this.positionMat, this.positionMat, translation)
+    return this
+  }
+
+  rotate(rad: number, axis: Vec3): Cube {
+    mat4.rotate(this.orientationMat, this.orientationMat, rad, axis)
+    return this
+  }
+}

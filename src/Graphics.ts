@@ -1,3 +1,54 @@
+const graphics = {
+  createCanvas(): HTMLCanvasElement {
+    return document.createElement('canvas')
+  },
+
+  setSize(canvas: HTMLCanvasElement, width: number, height: number): HTMLCanvasElement {
+    canvas.width = width
+    canvas.height = height
+    return canvas
+  },
+
+  getWebGL(canvas: HTMLCanvasElement): WebGLRenderingContext {
+    let gl = canvas.getContext('webgl', { preserveDrawingBuffer: true })
+    if (gl === null) {
+      throw 'Unable to initialize WebGL. Your browser or machine may not support it.'
+    }
+    return gl
+  },
+
+  initGL(gl: WebGLRenderingContext): WebGLRenderingContext {
+    gl.clearColor(0, 0, 0, 1)
+    gl.clear(gl.COLOR_BUFFER_BIT)
+    return gl
+  },
+
+  startRecording(canvas: HTMLCanvasElement, time: number) {
+    const chunks: Blob[] = [] // here we will store our recorded media chunks (Blobs)
+    const stream = canvas.captureStream() // grab our canvas MediaStream
+    const rec = new MediaRecorder(stream) // init the recorder
+    // every time the recorder has new data, we will store it in our array
+    rec.ondataavailable = e => chunks.push(e.data)
+    // only when the recorder stops, we construct a complete Blob from all the chunks
+    rec.onstop = () => this.exportVid(new Blob(chunks, { type: 'video/webm' }))
+
+    rec.start()
+    setTimeout(() => rec.stop(), time) // stop recording in 3s
+  },
+
+  exportVid(blob: Blob) {
+    const vid = document.createElement('video');
+    vid.src = URL.createObjectURL(blob);
+    vid.controls = true;
+    document.body.appendChild(vid);
+    const a = document.createElement('a');
+    a.download = 'myvid.webm';
+    a.href = vid.src;
+    a.textContent = 'download the video';
+    document.body.appendChild(a);
+  }
+}
+
 // class Graphics {
 //   canvas: HTMLCanvasElement
 //   context: CanvasRenderingContext2D
